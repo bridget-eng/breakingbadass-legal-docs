@@ -114,4 +114,224 @@
                         <option value="general">General</option>
                         <option value="communication">Communication</option>
                         <option value="visitation">Visitation/Custody</option>
-                        <option
+                        <option value="financial">Financial</option>
+                        <option value="abuse">Abuse/Control</option>
+                        <option value="police">Police/Legal</option>
+                        <option value="witness">Witness Present</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Impact Level</label>
+                    <select id="impactLevel" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                        <option value="low">Low Impact</option>
+                        <option value="medium">Medium Impact</option>
+                        <option value="high">High Impact</option>
+                        <option value="critical">Critical</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div class="flex items-center">
+                    <input type="checkbox" id="witnessPresent" class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary">
+                    <label for="witnessPresent" class="ml-2 text-sm text-gray-700">Witness Present</label>
+                </div>
+                
+                <div class="flex items-center">
+                    <input type="checkbox" id="policeCalled" class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary">
+                    <label for="policeCalled" class="ml-2 text-sm text-gray-700">Police Called</label>
+                </div>
+            </div>
+            
+            <div class="mb-6">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Evidence Type</label>
+                <input type="text" id="evidenceType" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="e.g., Text message, Email, Police report">
+            </div>
+            
+            <div class="flex space-x-3">
+                <button type="submit" class="flex-1 bg-primary hover:bg-blue-800 text-white py-3 rounded-lg font-semibold transition duration-300">
+                    Add Event
+                </button>
+                <button type="button" onclick="closeAddEventModal()" class="px-6 py-3 border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition duration-300">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    let currentEvents = [];
+
+    // Load timeline events on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        loadTimelineEvents();
+    });
+
+    async function loadTimelineEvents() {
+        try {
+            const response = await fetch(`/api/timeline_events/{{ case.id }}`);
+            const events = await response.json();
+            currentEvents = events;
+            
+            displayEvents(events);
+            updatePatternAnalysis(events);
+        } catch (error) {
+            console.error('Error loading timeline events:', error);
+        }
+    }
+
+    function displayEvents(events) {
+        const container = document.getElementById('timelineEvents');
+        const noEventsMessage = document.getElementById('noEventsMessage');
+        
+        if (events.length === 0) {
+            container.classList.add('hidden');
+            noEventsMessage.classList.remove('hidden');
+            return;
+        }
+        
+        container.classList.remove('hidden');
+        noEventsMessage.classList.add('hidden');
+        
+        container.innerHTML = events.map(event => `
+            <div class="relative pl-8 pb-6 border-l-2 border-gray-200">
+                <div class="absolute -left-3 top-0 w-6 h-6 ${getImpactColor(event.impact_level)} rounded-full border-2 border-white"></div>
+                <div class="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition duration-300">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <h3 class="text-lg font-semibold text-gray-900">${event.event_title}</h3>
+                            <p class="text-sm text-gray-500 mt-1">${formatDate(event.event_date)} ${event.event_time ? 'at ' + event.event_time : ''}</p>
+                            ${event.event_description ? `<p class="text-gray-700 mt-2">${event.event_description}</p>` : ''}
+                            <div class="flex flex-wrap gap-2 mt-3">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getCategoryColor(event.category)}">
+                                    ${event.category|title}
+                                </span>
+                                ${event.evidence_type ? `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">${event.evidence_type}</span>` : ''}
+                                ${event.witness_present ? '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Witness Present</span>' : ''}
+                                ${event.police_called ? '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Police Called</span>' : ''}
+                            </div>
+                        </div>
+                        <div class="ml-4 flex-shrink-0">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getImpactBadgeColor(event.impact_level)}">
+                                ${event.impact_level|title}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function getImpactColor(impact) {
+        switch(impact) {
+            case 'high': return 'bg-red-500';
+            case 'medium': return 'bg-yellow-500';
+            case 'critical': return 'bg-purple-500';
+            default: return 'bg-green-500';
+        }
+    }
+
+    function getCategoryColor(category) {
+        switch(category) {
+            case 'abuse': return 'bg-red-100 text-red-800';
+            case 'communication': return 'bg-blue-100 text-blue-800';
+            case 'police': return 'bg-purple-100 text-purple-800';
+            case 'witness': return 'bg-green-100 text-green-800';
+            default: return 'bg-gray-100 text-gray-800';
+        }
+    }
+
+    function getImpactBadgeColor(impact) {
+        switch(impact) {
+            case 'high': return 'bg-red-100 text-red-800';
+            case 'medium': return 'bg-yellow-100 text-yellow-800';
+            case 'critical': return 'bg-purple-100 text-purple-800';
+            default: return 'bg-green-100 text-green-800';
+        }
+    }
+
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+    }
+
+    function updatePatternAnalysis(events) {
+        const highImpactCount = events.filter(e => e.impact_level === 'high' || e.impact_level === 'critical').length;
+        const patternCount = events.filter(e => e.category === 'abuse' || e.category === 'communication').length;
+        
+        document.getElementById('highImpactCount').textContent = highImpactCount;
+        document.getElementById('patternCount').textContent = patternCount;
+        
+        // Simple evidence quality assessment
+        let quality = 'Good';
+        if (events.some(e => e.police_called || e.witness_present)) quality = 'Strong';
+        if (events.length > 10 && highImpactCount > 3) quality = 'Very Strong';
+        
+        document.getElementById('evidenceQuality').textContent = quality;
+    }
+
+    function showAddEventModal() {
+        document.getElementById('addEventModal').classList.remove('hidden');
+    }
+
+    function closeAddEventModal() {
+        document.getElementById('addEventModal').classList.add('hidden');
+        // Reset form
+        document.getElementById('eventDate').value = '';
+        document.getElementById('eventTime').value = '';
+        document.getElementById('eventTitle').value = '';
+        document.getElementById('eventDescription').value = '';
+        document.getElementById('eventCategory').value = 'general';
+        document.getElementById('impactLevel').value = 'medium';
+        document.getElementById('witnessPresent').checked = false;
+        document.getElementById('policeCalled').checked = false;
+        document.getElementById('evidenceType').value = '';
+    }
+
+    async function addTimelineEvent(event) {
+        event.preventDefault();
+        
+        const eventData = {
+            case_id: {{ case.id }},
+            event_date: document.getElementById('eventDate').value,
+            event_time: document.getElementById('eventTime').value,
+            event_title: document.getElementById('eventTitle').value,
+            event_description: document.getElementById('eventDescription').value,
+            category: document.getElementById('eventCategory').value,
+            impact_level: document.getElementById('impactLevel').value,
+            witness_present: document.getElementById('witnessPresent').checked,
+            police_called: document.getElementById('policeCalled').checked,
+            evidence_type: document.getElementById('evidenceType').value
+        };
+        
+        try {
+            const response = await fetch('/api/timeline_event', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(eventData)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                closeAddEventModal();
+                loadTimelineEvents();
+            } else {
+                alert('Error adding event. Please try again.');
+            }
+        } catch (error) {
+            alert('Network error. Please try again.');
+        }
+    }
+
+    function exportTimeline() {
+        alert('Export functionality coming soon! This will generate a court-ready PDF document.');
+    }
+</script>
+{% endblock %}
