@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Timeline - {{ case.case_title }} | Breaking Badass Legal Docs{% endblock %}
+
+{% block content %}
+<section class="bg-gray-50 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Case Header -->
+        <div class="bg-white rounded-lg card-shadow p-6 mb-8 fade-in">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">{{ case.case_title }}</h1>
+                    <p class="text-gray-600 mt-2">{{ case.case_type }} • Created {{ case.created_at.strftime('%B %d, %Y') }}</p>
+                </div>
+                <div class="flex space-x-3">
+                    <button onclick="showAddEventModal()" class="bg-primary hover:bg-blue-800 text-white px-4 py-2 rounded-lg font-medium transition duration-300">
+                        Add Event
+                    </button>
+                    <button onclick="exportTimeline()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg font-medium transition duration-300">
+                        Export
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline Visualization -->
+        <div class="bg-white rounded-lg card-shadow p-6 mb-8 fade-in">
+            <h2 class="text-xl font-semibold text-gray-900 mb-6">Case Timeline</h2>
+            
+            <div id="timelineContainer" class="relative">
+                <!-- Timeline events will be populated here -->
+                <div id="timelineEvents" class="space-y-6">
+                    <!-- Events will be dynamically loaded -->
+                </div>
+                
+                <div id="noEventsMessage" class="text-center py-12 hidden">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">No timeline events yet</h3>
+                    <p class="mt-1 text-sm text-gray-500">Get started by adding your first event to the timeline.</p>
+                    <button onclick="showAddEventModal()" class="mt-4 bg-primary hover:bg-blue-800 text-white px-4 py-2 rounded-lg font-medium transition duration-300">
+                        Add First Event
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pattern Analysis -->
+        <div class="bg-white rounded-lg card-shadow p-6 fade-in">
+            <h2 class="text-xl font-semibold text-gray-900 mb-6">Pattern Analysis</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-red-50 p-4 rounded-lg">
+                    <h3 class="font-semibold text-red-800 mb-2">High Impact Events</h3>
+                    <p class="text-2xl font-bold text-red-600" id="highImpactCount">0</p>
+                    <p class="text-sm text-red-600">Events requiring immediate attention</p>
+                </div>
+                
+                <div class="bg-yellow-50 p-4 rounded-lg">
+                    <h3 class="font-semibold text-yellow-800 mb-2">Pattern Indicators</h3>
+                    <p class="text-2xl font-bold text-yellow-600" id="patternCount">0</p>
+                    <p class="text-sm text-yellow-600">Potential coercive control patterns</p>
+                </div>
+                
+                <div class="bg-green-50 p-4 rounded-lg">
+                    <h3 class="font-semibold text-green-800 mb-2">Evidence Quality</h3>
+                    <p class="text-2xl font-bold text-green-600" id="evidenceQuality">Good</p>
+                    <p class="text-sm text-green-600">Strength of documented evidence</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Add Event Modal -->
+<div id="addEventModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg p-8 max-w-2xl w-full mx-4 max-h-screen overflow-y-auto">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-900">Add Timeline Event</h2>
+            <button onclick="closeAddEventModal()" class="text-gray-400 hover:text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <form onsubmit="addTimelineEvent(event)">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Date *</label>
+                    <input type="date" id="eventDate" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" required>
+                </div>
+                
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Time</label>
+                    <input type="time" id="eventTime" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Event Title *</label>
+                <input type="text" id="eventTitle" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Brief description of the event" required>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Detailed Description</label>
+                <textarea id="eventDescription" rows="4" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Provide detailed information about what happened..."></textarea>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Category</label>
+                    <select id="eventCategory" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                        <option value="general">General</option>
+                        <option value="communication">Communication</option>
+                        <option value="visitation">Visitation/Custody</option>
+                        <option
