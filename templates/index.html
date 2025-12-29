@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}Breaking Badass Legal Docs - Professional Documentation Platform{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-gradient-to-r from-blue-800 to-gray-700 text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+        <div class="text-center fade-in">
+            <h1 class="text-5xl font-bold mb-6">Professional Legal Documentation Made Simple</h1>
+            <p class="text-xl mb-8 max-w-3xl mx-auto">Transform your family court preparation with paralegal-grade documentation tools. Organize evidence, create timelines, and build compelling cases that attorneys and judges understand.</p>
+            <div class="space-x-4">
+                <button onclick="showSignupModal()" class="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded-lg font-semibold text-lg transition duration-300">Get Started Free</button>
+                <a href="#features" class="bg-transparent border-2 border-white hover:bg-white hover:text-gray-800 text-white px-8 py-3 rounded-lg font-semibold text-lg transition duration-300">Learn More</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16 fade-in">
+            <h2 class="text-4xl font-bold text-gray-900 mb-4">Why Choose Our Platform?</h2>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">Built by a paralegal with 20+ years of experience, specifically designed for family court documentation and coercive control cases.</p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="bg-white p-8 rounded-lg shadow-lg fade-in">
+                <div class="w-12 h-12 bg-blue-800 rounded-lg flex items-center justify-center mb-6">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-semibold text-gray-900 mb-4">Document Organization</h3>
+                <p class="text-gray-600">Upload and categorize evidence with smart tagging and organization features designed for legal proceedings.</p>
+            </div>
+
+            <div class="bg-white p-8 rounded-lg shadow-lg fade-in">
+                <div class="w-12 h-12 bg-blue-800 rounded-lg flex items-center justify-center mb-6">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-semibold text-gray-900 mb-4">Timeline Creation</h3>
+                <p class="text-gray-600">Build comprehensive chronologies showing patterns of coercive control and abuse for pre-litigation preparation.</p>
+            </div>
+
+            <div class="bg-white p-8 rounded-lg shadow-lg fade-in">
+                <div class="w-12 h-12 bg-blue-800 rounded-lg flex items-center justify-center mb-6">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-semibold text-gray-900 mb-4">Court-Ready Output</h3>
+                <p class="text-gray-600">Generate professional documentation packages that attorneys, GALs, and judges will read and understand.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Login/Signup Modal -->
+<div id="authModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+        <div class="flex justify-between items-center mb-6">
+            <h2 id="modalTitle" class="text-2xl font-bold text-gray-900">Sign Up</h2>
+            <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <form id="authForm" onsubmit="handleAuth(event)">
+            <div id="signupFields">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">First Name</label>
+                    <input type="text" id="firstName" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-800" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Last Name</label>
+                    <input type="text" id="lastName" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-800" required>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                <input type="email" id="email" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-800" required>
+            </div>
+            
+            <div class="mb-6">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
+                <input type="password" id="password" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-800" required>
+            </div>
+            
+            <button type="submit" class="w-full bg-blue-800 hover:bg-blue-900 text-white py-3 rounded-lg font-semibold transition duration-300">
+                <span id="submitText">Sign Up</span>
+            </button>
+        </form>
+        
+        <p class="mt-4 text-center text-gray-600">
+            <span id="switchText">Already have an account?</span>
+            <button onclick="toggleAuthMode()" id="switchButton" class="text-blue-800 hover:underline font-semibold">Log In</button>
+        </p>
+    </div>
+</div>
+
+<script>
+    let isLoginMode = false;
+
+    function showSignupModal() {
+        document.getElementById('authModal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+        document.getElementById('authModal').classList.add('hidden');
+    }
+
+    function toggleAuthMode() {
+        isLoginMode = !isLoginMode;
+        const modalTitle = document.getElementById('modalTitle');
+        const submitText = document.getElementById('submitText');
+        const switchText = document.getElementById('switchText');
+        const switchButton = document.getElementById('switchButton');
+        const signupFields = document.getElementById('signupFields');
+        
+        if (isLoginMode) {
+            modalTitle.textContent = 'Log In';
+            submitText.textContent = 'Log In';
+            switchText.textContent = "Don't have an account?";
+            switchButton.textContent = 'Sign Up';
+            signupFields.style.display = 'none';
+        } else {
+            modalTitle.textContent = 'Sign Up';
+            submitText.textContent = 'Sign Up';
+            switchText.textContent = 'Already have an account?';
+            switchButton.textContent = 'Log In';
+            signupFields.style.display = 'block';
+        }
+    }
+
+    async function handleAuth(event) {
+        event.preventDefault();
+        
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        
+        let endpoint = '/api/login';
+        let data = { email, password };
+        
+        if (!isLoginMode) {
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            endpoint = '/api/register';
+            data = { email, password, first_name: firstName, last_name: lastName };
+        }
+        
+        try {
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                window.location.href = '/dashboard';
+            } else {
+                alert(result.error || 'Authentication failed');
+            }
+        } catch (error) {
+            alert('Network error. Please try again.');
+        }
+    }
+</script>
+{% endblock %}
