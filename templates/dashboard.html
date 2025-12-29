@@ -185,7 +185,58 @@
                 <label class="block text-gray-700 text-sm font-bold mb-2">Case Title</label>
                 <input type="text" id="caseTitle" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="e.g., Smith v. Smith Custody Case" required>
             </div>
-            
             <div class="mb-6">
-                <label class="block text-gray-700 text-sm font
-                    {% endblock %}
+            <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
+            <input type="password" id="password" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-800" required>
+        </div>
+        
+        <button type="submit" class="w-full bg-blue-800 hover:bg-blue-900 text-white py-3 rounded-lg font-semibold transition duration-300">
+            <span id="submitText">Sign Up</span>
+        </button>
+    </form>
+</div>
+
+<script>
+    function showCreateCaseModal() {
+        document.getElementById('createCaseModal').classList.remove('hidden');
+    }
+
+    function closeCreateCaseModal() {
+        document.getElementById('createCaseModal').classList.add('hidden');
+    }
+
+    async function createCase(event) {
+        event.preventDefault();
+        
+        const caseTitle = document.getElementById('caseTitle').value;
+        const caseType = document.getElementById('caseType').value;
+        
+        try {
+            const response = await fetch('/api/case', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ case_title: caseTitle, case_type: caseType })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                window.location.reload();
+            } else {
+                alert('Error creating case. Please try again.');
+            }
+        } catch (error) {
+            alert('Network error. Please try again.');
+        }
+    }
+
+    function showUploadModal() {
+        alert('Document upload feature coming soon!');
+    }
+
+    function showTimelineModal() {
+        alert('Timeline event creation coming soon! Please use the Timeline page for now.');
+    }
+</script>
+{% endblock %}
+          
