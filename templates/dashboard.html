@@ -150,7 +150,7 @@
                         <div class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg">
                             <div>
                                 <h3 class="text-sm font-medium text-gray-900">{{ case.case_title }}</h3>
-                                <p class="text-xs text-gray-500">{{ case.case_type }}</p>
+                                <p class="text-xs text-gray-500">{{ case.case_focus|replace('_', ' ')|title }}</p>
                                 <p class="text-xs text-gray-400">{{ case.created_at.strftime('%B %d, %Y') }}</p>
                             </div>
                             <a href="{{ url_for('timeline', case_id=case.id) }}" class="text-blue-800 hover:underline text-sm font-medium">View Timeline</a>
@@ -187,14 +187,15 @@
             </div>
             
             <div class="mb-6">
-                <label class="block text-gray-700 text-sm font-bold mb-2">Case Type</label>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Case Focus</label>
                 <select id="caseType" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-800">
-                    <option value="Family Law">Family Law</option>
-                    <option value="Custody Dispute">Custody Dispute</option>
-                    <option value="Divorce">Divorce</option>
-                    <option value="Protection Order">Protection Order</option>
-                    <option value="Other">Other</option>
+                    <option value="CUSTODY_PARENTING">Custody & Parenting Time</option>
+                    <option value="DOMESTIC_VIOLENCE">Domestic Violence / Abuse</option>
+                    <option value="DIVORCE_SEPARATION">Divorce / Separation</option>
+                    <option value="POST_ORDER_ENFORCEMENT">Order Enforcement / Modification</option>
+                    <option value="OTHER">Other</option>
                 </select>
+                <p class="text-xs text-gray-500 mt-1">Select the primary issue you are documenting. You can track multiple issues inside one case.</p>
             </div>
             
             <button type="submit" class="w-full bg-blue-800 hover:bg-blue-900 text-white py-3 rounded-lg font-semibold transition duration-300">
