@@ -107,20 +107,20 @@
                 <textarea id="eventDescription" rows="4" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-800" placeholder="Provide detailed information about what happened..."></textarea>
             </div>
             
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Event Category</label>
+                <select id="eventCategory" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-800">
+                    <option value="PARENTING_TIME">Parenting Time & Custody</option>
+                    <option value="CHILD_WELLBEING">Child Wellbeing & Care</option>
+                    <option value="COMMUNICATION">Communication & Co-Parenting</option>
+                    <option value="ORDER_COMPLIANCE">Order Compliance / Non-Compliance</option>
+                    <option value="SAFETY_CONCERN">Safety Concerns</option>
+                    <option value="FINANCIAL">Financial & Support Issues</option>
+                    <option value="LEGAL_EVENT">Legal / Court-Related Event</option>
+                </select>
+            </div>
+            
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Category</label>
-                    <select id="eventCategory" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-800">
-                        <option value="general">General</option>
-                        <option value="communication">Communication</option>
-                        <option value="visitation">Visitation/Custody</option>
-                        <option value="financial">Financial</option>
-                        <option value="abuse">Abuse/Control</option>
-                        <option value="police">Police/Legal</option>
-                        <option value="witness">Witness Present</option>
-                    </select>
-                </div>
-                
                 <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2">Impact Level</label>
                     <select id="impactLevel" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-800">
@@ -129,6 +129,11 @@
                         <option value="high">High Impact</option>
                         <option value="critical">Critical</option>
                     </select>
+                </div>
+                
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Evidence Type</label>
+                    <input type="text" id="evidenceType" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-800" placeholder="e.g., Text message, Email, Police report">
                 </div>
             </div>
             
@@ -142,11 +147,6 @@
                     <input type="checkbox" id="policeCalled" class="w-4 h-4 text-blue-800 border-gray-300 rounded focus:ring-blue-800">
                     <label for="policeCalled" class="ml-2 text-sm text-gray-700">Police Called</label>
                 </div>
-            </div>
-            
-            <div class="mb-6">
-                <label class="block text-gray-700 text-sm font-bold mb-2">Evidence Type</label>
-                <input type="text" id="evidenceType" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-800" placeholder="e.g., Text message, Email, Police report">
             </div>
             
             <div class="flex space-x-3">
@@ -206,7 +206,7 @@
                             ${event.event_description ? `<p class="text-gray-700 mt-2">${event.event_description}</p>` : ''}
                             <div class="flex flex-wrap gap-2 mt-3">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getCategoryColor(event.category)}">
-                                    ${event.category}
+                                    ${getCategoryLabel(event.category)}
                                 </span>
                                 ${event.evidence_type ? `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">${event.evidence_type}</span>` : ''}
                                 ${event.witness_present ? '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Witness Present</span>' : ''}
@@ -224,22 +224,38 @@
         `).join('');
     }
 
+    function getCategoryColor(category) {
+        switch(category) {
+            case 'PARENTING_TIME': return 'bg-blue-100 text-blue-800';
+            case 'CHILD_WELLBEING': return 'bg-green-100 text-green-800';
+            case 'COMMUNICATION': return 'bg-yellow-100 text-yellow-800';
+            case 'ORDER_COMPLIANCE': return 'bg-purple-100 text-purple-800';
+            case 'SAFETY_CONCERN': return 'bg-red-100 text-red-800';
+            case 'FINANCIAL': return 'bg-orange-100 text-orange-800';
+            case 'LEGAL_EVENT': return 'bg-indigo-100 text-indigo-800';
+            default: return 'bg-gray-100 text-gray-800';
+        }
+    }
+
+    function getCategoryLabel(category) {
+        const labels = {
+            'PARENTING_TIME': 'Parenting Time & Custody',
+            'CHILD_WELLBEING': 'Child Wellbeing & Care',
+            'COMMUNICATION': 'Communication & Co-Parenting',
+            'ORDER_COMPLIANCE': 'Order Compliance',
+            'SAFETY_CONCERN': 'Safety Concerns',
+            'FINANCIAL': 'Financial & Support',
+            'LEGAL_EVENT': 'Legal/Court Event'
+        };
+        return labels[category] || category;
+    }
+
     function getImpactColor(impact) {
         switch(impact) {
             case 'high': return 'bg-red-500';
             case 'medium': return 'bg-yellow-500';
             case 'critical': return 'bg-purple-500';
             default: return 'bg-green-500';
-        }
-    }
-
-    function getCategoryColor(category) {
-        switch(category) {
-            case 'abuse': return 'bg-red-100 text-red-800';
-            case 'communication': return 'bg-blue-100 text-blue-800';
-            case 'police': return 'bg-purple-100 text-purple-800';
-            case 'witness': return 'bg-green-100 text-green-800';
-            default: return 'bg-gray-100 text-gray-800';
         }
     }
 
@@ -263,7 +279,7 @@
 
     function updatePatternAnalysis(events) {
         const highImpactCount = events.filter(e => e.impact_level === 'high' || e.impact_level === 'critical').length;
-        const patternCount = events.filter(e => e.category === 'abuse' || e.category === 'communication').length;
+        const patternCount = events.filter(e => e.category === 'COMMUNICATION' || e.category === 'SAFETY_CONCERN').length;
         
         document.getElementById('highImpactCount').textContent = highImpactCount;
         document.getElementById('patternCount').textContent = patternCount;
@@ -286,7 +302,7 @@
         document.getElementById('eventTime').value = '';
         document.getElementById('eventTitle').value = '';
         document.getElementById('eventDescription').value = '';
-        document.getElementById('eventCategory').value = 'general';
+        document.getElementById('eventCategory').value = 'PARENTING_TIME';
         document.getElementById('impactLevel').value = 'medium';
         document.getElementById('witnessPresent').checked = false;
         document.getElementById('policeCalled').checked = false;
