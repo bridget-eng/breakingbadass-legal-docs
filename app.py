@@ -30,7 +30,8 @@ class Case(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     case_title = db.Column(db.String(200), nullable=False)
-    case_type = db.Column(db.String(100))
+    case_focus = db.Column(db.String(100))  # Changed from case_type to case_focus
+    legal_domain = db.Column(db.String(50), default='FAMILY_LAW')  # Added for backend categorization
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     timeline_events = db.relationship('TimelineEvent', backref='case', lazy=True)
     documents = db.relationship('Document', backref='case', lazy=True)
@@ -144,7 +145,8 @@ def create_case():
     case = Case(
         user_id=session['user_id'],
         case_title=data.get('case_title'),
-        case_type=data.get('case_type', 'Family Law')
+        case_focus=data.get('case_type', 'CUSTODY_PARENTING'),  # Using case_focus field
+        legal_domain='FAMILY_LAW'  # Backend categorization
     )
     
     db.session.add(case)
@@ -165,7 +167,7 @@ def create_timeline_event():
         event_date=event_date,
         event_title=data.get('event_title'),
         event_description=data.get('event_description', ''),
-        category=data.get('category', 'general'),
+        category=data.get('category', 'PARENTING_TIME'),
         evidence_type=data.get('evidence_type', ''),
         impact_level=data.get('impact_level', 'medium'),
         witness_present=data.get('witness_present', False),
