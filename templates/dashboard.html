@@ -1,279 +1,515 @@
-{% extends "base.html" %}
-
-{% block title %}Dashboard - Breaking Badass Legal Docs{% endblock %}
-
-{% block content %}
-<section class="py-8">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Welcome Header -->
-        <div class="mb-8 fade-in">
-            <h1 class="text-3xl font-bold text-primary">Welcome back, {{ user.first_name }}!</h1>
-            <p class="text-gray-600 mt-2">Professional Legal Documentation Dashboard</p>
-        </div>
-
-        <!-- Professional Case Insights -->
-        {% if insights %}
-        <div class="bg-white rounded-lg shadow-lg p-6 mb-8 fade-in border border-sage">
-            <h2 class="text-xl font-semibold text-primary mb-4">Professional Case Insights</h2>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div class="insight-card bg-blue-50 p-4 rounded-lg">
-                    <h3 class="font-semibold text-blue-800 mb-2">Active Cases</h3>
-                    <p class="text-2xl font-bold text-blue-600">{{ insights.total_cases }}</p>
-                    <p class="text-sm text-blue-600">Total cases documented</p>
-                </div>
-                <div class="insight-card bg-red-50 p-4 rounded-lg">
-                    <h3 class="font-semibold text-red-800 mb-2">Priority Events</h3>
-                    <p class="text-2xl font-bold text-red-600">{{ insights.priority_events }}</p>
-                    <p class="text-sm text-red-600">High/critical impact events</p>
-                </div>
-                <div class="insight-card bg-yellow-50 p-4 rounded-lg">
-                    <h3 class="font-semibold text-yellow-800 mb-2">Documentation Quality</h3>
-                    <p class="text-2xl font-bold text-yellow-600">{{ insights.documentation_quality }}</p>
-                    <p class="text-sm text-yellow-600">Evidence completeness</p>
-                </div>
-                <div class="insight-card bg-green-50 p-4 rounded-lg">
-                    <h3 class="font-semibold text-green-800 mb-2">Court Readiness</h3>
-                    <p class="text-2xl font-bold text-green-600">{{ insights.court_readiness }}</p>
-                    <p class="text-sm text-green-600">Ready for presentation</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Breaking Badass Legal Docs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #F7F3EF; }
+        .text-primary { color: #5D654E; }
+        .bg-primary { background-color: #5D654E; }
+        .bg-secondary { background-color: #000000; }
+        .text-accent { color: #ECCDC2; }
+        .bg-accent { background-color: #ECCDC2; }
+        .bg-sage { background-color: #C3CABC; }
+        .border-primary { border-color: #5D654E; }
+        .btn-primary { background-color: #5D654E; color: white; padding: 0.75rem 1.5rem; border-radius: 0.375rem; font-weight: 500; transition: background-color 0.3s ease; }
+        .btn-primary:hover { background-color: #4a5540; }
+        .btn-secondary { background-color: #000000; color: white; padding: 0.75rem 1.5rem; border-radius: 0.375rem; font-weight: 500; transition: background-color 0.3s ease; }
+        .btn-secondary:hover { background-color: #333333; }
+        .btn-accent { background-color: #ECCDC2; color: #5D654E; padding: 0.75rem 1.5rem; border-radius: 0.375rem; font-weight: 500; transition: background-color 0.3s ease; }
+        .btn-accent:hover { background-color: #e4c4b8; }
+        .card-shadow { box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .stat-card { background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); }
+        .recent-item { border-left: 4px solid #5D654E; }
+        .empty-state { color: #9ca3af; text-align: center; padding: 3rem; }
+        .loading { opacity: 0.6; pointer-events: none; }
+        .error-message { background-color: #fef2f2; border: 1px solid #fecaca; color: #dc2626; padding: 1rem; border-radius: 0.5rem; margin: 1rem 0; }
+        .success-message { background-color: #f0fdf4; border: 1px solid #bbf7d0; color: #16a34a; padding: 1rem; border-radius: 0.5rem; margin: 1rem 0; }
+    </style>
+</head>
+<body class="bg-warm-neutral">
+    <div class="min-h-screen">
+        <!-- Navigation -->
+        <nav class="bg-white shadow-lg border-b-2 border-primary">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <h1 class="text-2xl font-bold text-primary">Breaking Badass Legal Docs</h1>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <a href="/dashboard" class="text-primary hover:text-accent font-medium">Dashboard</a>
+                        <a href="/timeline-event" class="text-primary hover:text-accent font-medium">Add Timeline Event</a>
+                        <a href="/communication-log" class="text-primary hover:text-accent font-medium">Communication Log</a>
+                        <button onclick="logout()" class="text-primary hover:text-accent font-medium">Logout</button>
+                    </div>
                 </div>
             </div>
-        </div>
-        {% endif %}
+        </nav>
 
-        <!-- Stats Overview -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white rounded-lg shadow-lg p-6 fade-in border-l-4 border-primary">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <div class="w-8 h-8 bg-sage rounded-lg flex items-center justify-center">
-                            <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Welcome Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-primary mb-2">Welcome to Your Dashboard</h1>
+                <p class="text-gray-600">Manage your legal documentation and track your case progress</p>
+            </div>
+
+            <!-- Quick Action Buttons -->
+            <div class="flex flex-wrap gap-4 mb-8">
+                <button onclick="showCreateCaseModal()" class="btn-primary">
+                    <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    Create New Case
+                </button>
+                <a href="/timeline-event" class="btn-secondary">
+                    <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Add Timeline Event
+                </a>
+                <a href="/communication-log" class="btn-accent">
+                    <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                    </svg>
+                    Communication Log
+                </a>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="grid md:grid-cols-3 gap-6 mb-8">
+                <div class="stat-card rounded-lg shadow-lg p-6 border-l-4 border-primary">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                             </svg>
                         </div>
-                    </div>
-                    <div class="ml-5 w-0 flex-1">
-                        <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Active Cases</dt>
-                            <dd class="text-lg font-medium text-primary">{{ cases|length }}</dd>
-                        </dl>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Active Cases</dt>
+                                <dd class="text-3xl font-semibold text-primary" id="caseCount">0</dd>
+                            </dl>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="bg-white rounded-lg shadow-lg p-6 fade-in border-l-4 border-accent">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <div class="w-8 h-8 bg-accent rounded-lg flex items-center justify-center">
-                            <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="stat-card rounded-lg shadow-lg p-6 border-l-4 border-secondary">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <svg class="w-8 h-8 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
                         </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Timeline Events</dt>
+                                <dd class="text-3xl font-semibold text-secondary" id="eventCount">0</dd>
+                            </dl>
+                        </div>
                     </div>
-                    <div class="ml-5 w-0 flex-1">
-                        <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Timeline Events</dt>
-                            <dd class="text-lg font-medium text-primary">{{ recent_events|length }}</dd>
-                        </dl>
+                </div>
+
+                <div class="stat-card rounded-lg shadow-lg p-6 border-l-4 border-accent">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <svg class="w-8 h-8 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Communications</dt>
+                                <dd class="text-3xl font-semibold text-accent" id="communicationCount">0</dd>
+                            </dl>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg shadow-lg p-6 fade-in border-l-4 border-yellow-400">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <div class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
-                            <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="ml-5 w-0 flex-1">
-                        <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Evidence Strength</dt>
-                            <dd class="text-lg font-medium text-primary">Strong</dd>
-                        </dl>
+            <!-- Case Management Section -->
+            <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-primary">Your Cases</h2>
+                    <button onclick="showCreateCaseModal()" class="btn-primary text-sm">
+                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        New Case
+                    </button>
+                </div>
+
+                <!-- Cases List -->
+                <div id="casesList" class="space-y-4">
+                    <!-- Cases will be loaded here -->
+                    <div class="empty-state">
+                        <svg class="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <h3 class="text-xl font-semibold text-gray-500 mb-2">No Cases Yet</h3>
+                        <p class="text-gray-400 mb-4">Create your first case to start documenting evidence and timeline events.</p>
+                        <button onclick="showCreateCaseModal()" class="btn-primary">Create First Case</button>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg shadow-lg p-6 fade-in border-l-4 border-purple-400">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                            <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            <!-- Recent Activity Section -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-primary mb-6">Recent Activity</h2>
+                
+                <!-- Tabs -->
+                <div class="border-b border-gray-200 mb-6">
+                    <nav class="-mb-px flex space-x-8">
+                        <button onclick="switchTab('events')" id="eventsTab" class="tab-button py-2 px-1 border-b-2 border-primary font-medium text-sm text-primary">
+                            Timeline Events
+                        </button>
+                        <button onclick="switchTab('communications')" id="communicationsTab" class="tab-button py-2 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                            Communications
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- Recent Events Tab -->
+                <div id="eventsContent" class="tab-content">
+                    <div id="recentEvents" class="space-y-4">
+                        <!-- Recent timeline events will be loaded here -->
+                        <div class="empty-state">
+                            <svg class="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
+                            <p class="text-gray-400">No recent timeline events</p>
                         </div>
                     </div>
-                    <div class="ml-5 w-0 flex-1">
-                        <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Subscription</dt>
-                            <dd class="text-lg font-medium text-primary capitalize">{{ user.subscription_tier }}</dd>
-                        </dl>
+                </div>
+
+                <!-- Recent Communications Tab -->
+                <div id="communicationsContent" class="tab-content hidden">
+                    <div id="recentCommunications" class="space-y-4">
+                        <!-- Recent communications will be loaded here -->
+                        <div class="empty-state">
+                            <svg class="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                            </svg>
+                            <p class="text-gray-400">No recent communications</p>
+                        </div>
                     </div>
                 </div>
             </div>
+        </main>
+    </div>
+
+    <!-- Create Case Modal -->
+    <div id="createCaseModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4 border-2 border-primary">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-primary">Create New Case</h2>
+                <button onclick="closeCreateCaseModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <form id="createCaseForm" onsubmit="createCase(event)">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Case Title *</label>
+                    <input type="text" id="caseTitle" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="e.g., Smith v. Jones Custody Case" required>
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Case Focus</label>
+                    <select id="caseFocus" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                        <option value="CUSTODY_PARENTING">Child Custody & Parenting Time</option>
+                        <option value="CHILD_SUPPORT">Child Support</option>
+                        <option value="DIVORCE_PROPERTY">Divorce & Property Division</option>
+                        <option value="DOMESTIC_VIOLENCE">Domestic Violence & Protection Orders</option>
+                        <option value="COERCIVE_CONTROL">Coercive Control</option>
+                        <option value="SUBSTANCE_ABUSE">Substance Abuse Impact</option>
+                        <option value="PARENTAL_ALIENATION">Parental Alienation</option>
+                        <option value="OTHER">Other</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn-primary w-full">Create Case</button>
+            </form>
         </div>
+    </div>
 
-        <!-- Quick Actions -->
-        <div class="mb-8">
-            <div class="bg-white rounded-lg shadow-lg p-6 fade-in border border-sage">
-                <h2 class="text-xl font-semibold text-primary mb-4">Quick Actions</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <button onclick="showCreateCaseModal()" class="flex items-center justify-center p-4 border-2 border-dashed border-sage rounded-lg hover:border-primary hover:bg-sage hover:text-white transition duration-300">
-                        <svg class="w-6 h-6 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m-6-6h6m-6 0H6"></path>
+    <script>
+        // Dashboard functionality
+        let currentUser = null;
+        let currentCases = [];
+        let recentEvents = [];
+        let recentCommunications = [];
+
+        // Initialize dashboard on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboard();
+        });
+
+        async function loadDashboard() {
+            try {
+                document.body.classList.add('loading');
+                
+                // Load cases
+                await loadCases();
+                
+                // Load recent activity
+                await loadRecentActivity();
+                
+                // Update stats
+                updateStats();
+                
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                showError('Failed to load dashboard. Please refresh the page.');
+            } finally {
+                document.body.classList.remove('loading');
+            }
+        }
+
+        async function loadCases() {
+            try {
+                const response = await fetch('/api/cases');
+                if (response.ok) {
+                    currentCases = await response.json();
+                    displayCases();
+                } else {
+                    console.error('Failed to load cases');
+                    showError('Failed to load cases.');
+                }
+            } catch (error) {
+                console.error('Error loading cases:', error);
+                showError('Network error loading cases.');
+            }
+        }
+
+        async function loadRecentActivity() {
+            try {
+                // Load recent timeline events from all cases
+                const eventsPromises = currentCases.map(case_ => 
+                    fetch(`/api/timeline_events/${case_.id}`).then(r => r.json())
+                );
+                
+                const eventsArrays = await Promise.all(eventsPromises);
+                recentEvents = eventsArrays.flat().sort((a, b) => new Date(b.event_date) - new Date(a.event_date)).slice(0, 5);
+                
+                // Load recent communications
+                const commResponse = await fetch('/api/communications');
+                if (commResponse.ok) {
+                    recentCommunications = await commResponse.json();
+                    recentCommunications = recentCommunications.slice(0, 5);
+                }
+                
+                displayRecentActivity();
+                
+            } catch (error) {
+                console.error('Error loading recent activity:', error);
+            }
+        }
+
+        function displayCases() {
+            const container = document.getElementById('casesList');
+            
+            if (currentCases.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <svg class="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                         </svg>
-                        <span class="text-gray-600 font-medium">Create New Case</span>
-                    </button>
-                    
-                    <button onclick="showUploadModal()" class="flex items-center justify-center p-4 border-2 border-dashed border-sage rounded-lg hover:border-primary hover:bg-sage hover:text-white transition duration-300">
-                        <svg class="w-6 h-6 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                        </svg>
-                        <span class="text-gray-600 font-medium">Upload Document</span>
-                    </button>
-                    
-                    <button onclick="showTimelineModal()" class="flex items-center justify-center p-4 border-2 border-dashed border-sage rounded-lg hover:border-primary hover:bg-sage hover:text-white transition duration-300">
-                        <svg class="w-6 h-6 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <h3 class="text-xl font-semibold text-gray-500 mb-2">No Cases Yet</h3>
+                        <p class="text-gray-400 mb-4">Create your first case to start documenting evidence and timeline events.</p>
+                        <button onclick="showCreateCaseModal()" class="btn-primary">Create First Case</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = currentCases.map(case_ => `
+                <div class="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow recent-item">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="text-xl font-semibold text-primary mb-2">${case_.case_title}</h3>
+                            <p class="text-sm text-gray-600 mb-1">Focus: ${case_.case_focus.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}</p>
+                            <p class="text-sm text-gray-500">Created: ${new Date(case_.created_at).toLocaleDateString()}</p>
+                        </div>
+                        <div class="flex space-x-2">
+                            <a href="/timeline/${case_.id}" class="btn-primary text-sm">View Timeline</a>
+                            <button onclick="editCase(${case_.id})" class="btn-secondary text-sm">Edit</button>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-gray-500">
+                        <span>Case ID: ${case_.id}</span>
+                        <span>Legal Domain: ${case_.legal_domain.replace('_', ' ')}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function displayRecentActivity() {
+            // Display recent timeline events
+            const eventsContainer = document.getElementById('recentEvents');
+            if (recentEvents.length === 0) {
+                eventsContainer.innerHTML = `
+                    <div class="empty-state">
+                        <svg class="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
-                        <span class="text-gray-600 font-medium">Add Timeline Event</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Recent Activity -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- Recent Timeline Events -->
-            <div class="bg-white rounded-lg shadow-lg p-6 fade-in border border-sage">
-                <h2 class="text-xl font-semibold text-primary mb-4">Recent Timeline Events</h2>
-                <div class="space-y-4">
-                    {% if recent_events %}
-                        {% for event in recent_events[:5] %}
-                        <div class="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-lg">
-                            <div class="flex-shrink-0 w-2 h-2 bg-primary rounded-full mt-2"></div>
-                            <div class="flex-1">
-                                <p class="text-sm font-medium text-gray-900">{{ event.event_title }}</p>
-                                <p class="text-sm text-gray-500">{{ event.event_date.strftime('%B %d, %Y') }}</p>
-                                <p class="text-xs text-gray-400 mt-1">{{ event.category|title }}</p>
-                            </div>
+                        <p class="text-gray-400">No recent timeline events</p>
+                    </div>
+                `;
+            } else {
+                eventsContainer.innerHTML = recentEvents.map(event => `
+                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-semibold text-primary">${event.event_title}</h4>
+                            <span class="text-sm text-gray-500">${new Date(event.event_date).toLocaleDateString()}</span>
                         </div>
-                        {% endfor %}
-                    {% else %}
-                        <p class="text-gray-500 text-center py-4">No recent timeline events</p>
-                    {% endif %}
-                </div>
-                <div class="mt-6">
-                    <a href="#" class="text-primary hover:underline font-medium">View all timeline events →</a>
-                </div>
-            </div>
-
-            <!-- Active Cases -->
-            <div class="bg-white rounded-lg shadow-lg p-6 fade-in border border-sage">
-                <h2 class="text-xl font-semibold text-primary mb-4">Active Cases</h2>
-                <div class="space-y-4">
-                    {% if cases %}
-                        {% for case in cases %}
-                        <div class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg">
-                            <div>
-                                <h3 class="text-sm font-medium text-gray-900">{{ case.case_title }}</h3>
-                                <p class="text-xs text-gray-500">{{ case.case_focus|replace('_', ' ')|title }}</p>
-                                <p class="text-xs text-gray-400">{{ case.created_at.strftime('%B %d, %Y') }}</p>
-                            </div>
-                            <a href="{{ url_for('timeline', case_id=case.id) }}" class="text-primary hover:underline text-sm font-medium">View Timeline</a>
+                        <p class="text-sm text-gray-700 mb-2">${event.event_description}</p>
+                        <div class="flex justify-between items-center text-xs text-gray-500">
+                            <span>Category: ${event.category.replace('_', ' ')}</span>
+                            <span>Impact: ${event.impact_level}</span>
                         </div>
-                        {% endfor %}
-                    {% else %}
-                        <p class="text-gray-500 text-center py-4">No active cases</p>
-                    {% endif %}
-                </div>
-                <div class="mt-6">
-                    <button onclick="showCreateCaseModal()" class="text-primary hover:underline font-medium">Create new case →</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+                    </div>
+                `).join('');
+            }
 
-<!-- Create Case Modal -->
-<div id="createCaseModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
-    <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4 border-2 border-primary">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold text-primary">Create New Case</h2>
-            <button onclick="closeCreateCaseModal()" class="text-gray-400 hover:text-gray-600">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-            </button>
-        </div>
-        
-        <form onsubmit="createCase(event)">
-            <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2">Case Title</label>
-                <input type="text" id="caseTitle" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="e.g., Smith v. Smith Custody Case" required>
-            </div>
-            
-            <div class="mb-6">
-                <label class="block text-gray-700 text-sm font-bold mb-2">Case Focus</label>
-                <select id="caseType" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
-                    <option value="CUSTODY_PARENTING">Custody & Parenting Time</option>
-                    <option value="DOMESTIC_VIOLENCE">Domestic Violence / Abuse</option>
-                    <option value="DIVORCE_SEPARATION">Divorce / Separation</option>
-                    <option value="POST_ORDER_ENFORCEMENT">Order Enforcement / Modification</option>
-                    <option value="OTHER">Other</option>
-                </select>
-                <p class="text-xs text-gray-500 mt-1">Select the primary issue you are documenting. You can track multiple issues inside one case.</p>
-            </div>
-            
-            <button type="submit" class="w-full bg-primary hover:bg-gray-800 text-white py-3 rounded-lg font-semibold transition duration-300">
-                Create Case
-            </button>
-        </form>
-    </div>
-</div>
+            // Display recent communications
+            const commsContainer = document.getElementById('recentCommunications');
+            if (recentCommunications.length === 0) {
+                commsContainer.innerHTML = `
+                    <div class="empty-state">
+                        <svg class="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                        </svg>
+                        <p class="text-gray-400">No recent communications</p>
+                    </div>
+                `;
+            } else {
+                commsContainer.innerHTML = recentCommunications.map(comm => `
+                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="flex items-center space-x-2">
+                                <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">${comm.platform}</span>
+                                <span class="text-sm font-medium">${comm.sender} → ${comm.recipient}</span>
+                            </div>
+                            <span class="text-sm text-gray-500">${new Date(comm.date).toLocaleDateString()}</span>
+                        </div>
+                        <p class="text-sm text-gray-700 mb-2">${comm.neutral_summary}</p>
+                        <div class="text-xs text-gray-500">
+                            ${comm.evidence_type ? `Evidence: ${comm.evidence_type}` : 'No evidence attached'}
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
 
-<script>
-    function showCreateCaseModal() {
-        document.getElementById('createCaseModal').classList.remove('hidden');
-    }
+        function updateStats() {
+            document.getElementById('caseCount').textContent = currentCases.length;
+            document.getElementById('eventCount').textContent = recentEvents.length;
+            document.getElementById('communicationCount').textContent = recentCommunications.length;
+        }
 
-    function closeCreateCaseModal() {
-        document.getElementById('createCaseModal').classList.add('hidden');
-    }
-
-    async function createCase(event) {
-        event.preventDefault();
-        
-        const caseTitle = document.getElementById('caseTitle').value;
-        const caseType = document.getElementById('caseType').value;
-        
-        try {
-            const response = await fetch('/api/case', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ case_title: caseTitle, case_type: caseType })
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('border-primary', 'text-primary');
+                btn.classList.add('border-transparent', 'text-gray-500');
             });
             
-            const result = await response.json();
+            document.getElementById(tabName + 'Tab').classList.remove('border-transparent', 'text-gray-500');
+            document.getElementById(tabName + 'Tab').classList.add('border-primary', 'text-primary');
             
-            if (result.success) {
-                window.location.reload();
-            } else {
-                alert('Error creating case. Please try again.');
-            }
-        } catch (error) {
-            alert('Network error. Please try again.');
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            document.getElementById(tabName + 'Content').classList.remove('hidden');
         }
-    }
 
-    function showUploadModal() {
-        alert('Document upload feature coming soon!');
-    }
+        function showCreateCaseModal() {
+            document.getElementById('createCaseModal').classList.remove('hidden');
+        }
 
-    function showTimelineModal() {
-        alert('Timeline event creation coming soon! Please use the Timeline page for now.');
-    }
-</script>
-{% endblock %}
+        function closeCreateCaseModal() {
+            document.getElementById('createCaseModal').classList.add('hidden');
+            document.getElementById('createCaseForm').reset();
+        }
+
+        async function createCase(event) {
+            event.preventDefault();
+            
+            const caseTitle = document.getElementById('caseTitle').value;
+            const caseFocus = document.getElementById('caseFocus').value;
+            
+            if (!caseTitle.trim()) {
+                showError('Case title is required.');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/case', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        case_title: caseTitle,
+                        case_focus: caseFocus
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showSuccess('Case created successfully!');
+                    closeCreateCaseModal();
+                    await loadDashboard();
+                } else {
+                    showError(result.error || 'Failed to create case.');
+                }
+            } catch (error) {
+                console.error('Error creating case:', error);
+                showError('Network error. Please try again.');
+            }
+        }
+
+        async function logout() {
+            try {
+                await fetch('/api/logout', { method: 'POST' });
+                sessionStorage.clear();
+                window.location.href = '/';
+            } catch (error) {
+                console.error('Logout error:', error);
+                window.location.href = '/';
+            }
+        }
+
+        function editCase(caseId) {
+            alert('Edit case feature coming soon!');
+        }
+
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = message;
+            document.body.insertBefore(errorDiv, document.body.firstChild);
+            setTimeout(() => errorDiv.remove(), 5000);
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success-message';
+            successDiv.textContent = message;
+            document.body.insertBefore(successDiv, document.body.firstChild);
+            setTimeout(() => successDiv.remove(), 5000);
+        }
+    </script>
+</body>
+</html>
