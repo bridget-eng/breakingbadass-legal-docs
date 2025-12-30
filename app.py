@@ -4,7 +4,6 @@ import logging
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
-from flask_wtf.csrf import CSRFProtect
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, date
 import uuid
@@ -17,7 +16,7 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 
 # Production-ready configuration
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key-here')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
 
 # Database configuration - Heroku compatible
 if os.environ.get('DATABASE_URL'):
@@ -30,7 +29,7 @@ else:
     logger.info("Using SQLite database")
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['WTF_CSRF_ENABLED'] = False  # Disable CSRF for API endpoints
+app.config['WTF_CSRF_ENABLED'] = False  # Disable for API endpoints
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
@@ -49,6 +48,9 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     cases = db.relationship('Case', backref='user', lazy=True)
 
+    def __repr__(self):
+        return f'<User {self.email}>'
+
 class Case(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -58,6 +60,9 @@ class Case(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     timeline_events = db.relationship('TimelineEvent', backref='case', lazy=True, cascade='all, delete-orphan')
     documents = db.relationship('Document', backref='case', lazy=True, cascade='all, delete-orphan')
+
+    def __repr__(self):
+        return f'<Case {self.case_title}>'
 
 class TimelineEvent(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -87,6 +92,9 @@ class Document(db.Model):
 @app.route('/')
 def index():
     try:
+        # If user is already logged in, redirect to dashboard
+        if 'user_id' in session:
+            return redirect(url_for('dashboard'))
         return render_template('index.html')
     except Exception as e:
         logger.error(f"Error rendering index: {str(e)}")
@@ -95,15 +103,20 @@ def index():
 @app.route('/dashboard')
 def dashboard():
     try:
+        logger.info(f"Dashboard accessed - Session user_id: {session.get('user_id')}")
+        
         if 'user_id' not in session:
+            logger.info("No user_id in session, redirecting to index")
             return redirect(url_for('index'))
         
         user = User.query.get(session['user_id'])
         if not user:
+            logger.info(f"User not found with id {session['user_id']}, clearing session")
             session.pop('user_id', None)
             return redirect(url_for('index'))
         
         cases = Case.query.filter_by(user_id=user.id).all()
+        logger.info(f"Found {len(cases)} cases for user {user.email}")
         
         # Get recent timeline events
         recent_events = []
@@ -173,7 +186,7 @@ def register():
         db.session.commit()
         
         session['user_id'] = user.id
-        logger.info(f"User registered: {email}")
+        logger.info(f"User registered and logged in: {email}, session user_id: {user.id}")
         return jsonify({'success': True, 'user_id': user.id})
         
     except Exception as e:
@@ -198,7 +211,7 @@ def login():
         
         if user and check_password_hash(user.password_hash, password):
             session['user_id'] = user.id
-            logger.info(f"User logged in: {email}")
+            logger.info(f"User logged in: {email}, session user_id: {user.id}")
             return jsonify({'success': True, 'user_id': user.id})
         
         return jsonify({'error': 'Invalid credentials'}), 401
