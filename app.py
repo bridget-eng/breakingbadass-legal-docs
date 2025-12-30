@@ -86,7 +86,7 @@ def index():
         return render_template('index.html')
     except Exception as e:
         logger.error(f"Error rendering index: {str(e)}")
-        return "Internal Server Error", 500
+n        return "Internal Server Error", 500
 
 @app.route('/dashboard')
 def dashboard():
@@ -334,7 +334,7 @@ def get_timeline_events(case_id):
 
 # Error handlers
 @app.errorhandler(404)
-def not_found(error):
+ndef not_found(error):
     return render_template('index.html'), 404
 
 @app.errorhandler(500)
@@ -346,15 +346,6 @@ def internal_error(error):
 @app.route('/health')
 def health_check():
     return jsonify({'status': 'healthy', 'timestamp': datetime.utcnow().isoformat()}), 200
-
-# Initialize database before first request
-@app.before_first_request
-def create_tables():
-    try:
-        db.create_all()
-        logger.info("Database tables created successfully")
-    except Exception as e:
-        logger.error(f"Database initialization error: {str(e)}")
 
 # Production entry point
 if __name__ == '__main__':
