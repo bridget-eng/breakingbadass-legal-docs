@@ -206,3 +206,31 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+    @app.route('/api/export/<int:case_id>')
+def export_case(case_id):
+    case = Case.query.get_or_404(case_id)
+    events = TimelineEvent.query.filter_by(case_id=case.id).order_by(TimelineEvent.event_date).all()
+    
+    # Generate professional court-ready document
+    export_data = {
+        'case_title': case.case_title,
+        'case_focus': case.case_focus,
+        'events': [],
+        'summary': generate_case_summary(events),
+        'pattern_analysis': analyze_patterns(events),
+        'evidence_summary': summarize_evidence(events)
+    }
+    
+    for event in events:
+        export_data['events'].append({
+            'date': event.event_date.strftime('%B %d, %Y'),
+n            'title': event.event_title,
+            'description': event.event_description,
+            'category': get_category_label(event.category),
+            'impact': event.impact_level,
+            'evidence': event.evidence_type,
+            'witness': 'Yes' if event.witness_present else 'No',
+            'police': 'Yes' if event.police_called else 'No'
+        })
+    
+    return jsonify(export_data)
