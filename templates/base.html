@@ -53,6 +53,9 @@
             transition: background-color 0.3s ease;
             border: none;
             cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
         }
         .btn-primary:hover {
             background-color: #4a5240;
@@ -66,6 +69,9 @@
             transition: background-color 0.3s ease;
             border: 2px solid #5D654E;
             cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
         }
         .btn-secondary:hover {
             background-color: #5D654E;
@@ -97,6 +103,16 @@
         }
         .nav-link:hover {
             color: #5D654E;
+        }
+        /* Fade in animation */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
     </style>
 </head>
@@ -139,21 +155,20 @@
         // Simple fade-in animation without complex libraries
         document.addEventListener('DOMContentLoaded', function() {
             const fadeElements = document.querySelectorAll('.fade-in');
-            fadeElements.forEach((element, index) => {
-                setTimeout(() => {
-                    element.style.opacity = '1';
-                    element.style.transform = 'translateY(0)';
-                }, index * 100);
-            });
-        });
-
-        // Set default styles for fade-in elements
-        document.addEventListener('DOMContentLoaded', function() {
-            const fadeElements = document.querySelectorAll('.fade-in');
+            
+            // Intersection Observer for fade-in animation
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry, index) => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => {
+                            entry.target.classList.add('visible');
+                        }, index * 100);
+                    }
+                });
+            }, { threshold: 0.1 });
+            
             fadeElements.forEach(element => {
-                element.style.opacity = '0';
-                element.style.transform = 'translateY(20px)';
-                element.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+                observer.observe(element);
             });
         });
     </script>
