@@ -1,379 +1,181 @@
-{% extends "base.html" %}
+import os
+import json
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash
+from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS
+from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime, date
+from collections import defaultdict
+import uuid
+import calendar
 
-{% block title %}Timeline - {{ case.case_title }} | Breaking Badass Legal Docs{% endblock %}
+app = Flask(__name__)
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///legaldocs.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-{% block content %}
-<section class="bg-gray-50 py-8">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Case Header -->
-        <div class="bg-white rounded-lg shadow-lg p-6 mb-8 fade-in">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h1 class="text-3xl font-bold text-gray-900">{{ case.case_title }}</h1>
-                    <p class="text-gray-600 mt-2">{{ case.case_type }} • Created {{ case.created_at.strftime('%B %d, %Y') }}</p>
-                </div>
-                <div class="flex space-x-3">
-                    <button onclick="showAddEventModal()" class="bg-blue-800 hover:bg-blue-900 text-white px-4 py-2 rounded-lg font-medium transition duration-300">
-                        Add Event
-                    </button>
-                    <button onclick="exportTimeline()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg font-medium transition duration-300">
-                        Export
-                    </button>
-                </div>
-            </div>
-        </div>
+db = SQLAlchemy(app)
+CORS(app)
 
-        <!-- Timeline Visualization -->
-        <div class="bg-white rounded-lg shadow-lg p-6 mb-8 fade-in">
-            <h2 class="text-xl font-semibold text-gray-900 mb-6">Case Timeline</h2>
-            
-            <div id="timelineContainer" class="relative">
-                <!-- Timeline events will be populated here -->
-                <div id="timelineEvents" class="space-y-6">
-                    <!-- Events will be dynamically loaded -->
-                </div>
-                
-                <div id="noEventsMessage" class="text-center py-12 hidden">
-                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <h3 class="mt-2 text-sm font-medium text-gray-900">No timeline events yet</h3>
-                    <p class="mt-1 text-sm text-gray-500">Get started by adding your first event to the timeline.</p>
-                    <button onclick="showAddEventModal()" class="mt-4 bg-blue-800 hover:bg-blue-900 text-white px-4 py-2 rounded-lg font-medium transition duration-300">
-                        Add First Event
-                    </button>
-                </div>
-            </div>
-        </div>
+# Database Models
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(200), nullable=False)
+    first_name = db.Column(db.String(50))
+    last_name = db.Column(db.String(50))
+    subscription_tier = db.Column(db.String(20), default='basic')
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    cases = db.relationship('Case', backref='user', lazy=True)
 
-        <!-- Pattern Analysis -->
-        <div class="bg-white rounded-lg shadow-lg p-6 fade-in">
-            <h2 class="text-xl font-semibold text-gray-900 mb-6">Pattern Analysis</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-red-50 p-4 rounded-lg">
-                    <h3 class="font-semibold text-red-800 mb-2">High Impact Events</h3>
-                    <p class="text-2xl font-bold text-red-600" id="highImpactCount">0</p>
-                    <p class="text-sm text-red-600">Events requiring immediate attention</p>
-                </div>
-                
-                <div class="bg-yellow-50 p-4 rounded-lg">
-                    <h3 class="font-semibold text-yellow-800 mb-2">Pattern Indicators</h3>
-                    <p class="text-2xl font-bold text-yellow-600" id="patternCount">0</p>
-                    <p class="text-sm text-yellow-600">Potential coercive control patterns</p>
-                </div>
-                
-                <div class="bg-green-50 p-4 rounded-lg">
-                    <h3 class="font-semibold text-green-800 mb-2">Evidence Quality</h3>
-                    <p class="text-2xl font-bold text-green-600" id="evidenceQuality">Good</p>
-                    <p class="text-sm text-green-600">Strength of documented evidence</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+class Case(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    case_title = db.Column(db.String(200), nullable=False)
+    case_focus = db.Column(db.String(100))
+    legal_domain = db.Column(db.String(50), default='FAMILY_LAW')
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    timeline_events = db.relationship('TimelineEvent', backref='case', lazy=True)
+    documents = db.relationship('Document', backref='case', lazy=True)
 
-<!-- Add Event Modal -->
-<div id="addEventModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
-    <div class="bg-white rounded-lg p-8 max-w-2xl w-full mx-4 max-h-screen overflow-y-auto">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold text-gray-900">Add Timeline Event</h2>
-            <button onclick="closeAddEventModal()" class="text-gray-400 hover:text-gray-600">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-            </button>
-        </div>
-        
-        <form onsubmit="addTimelineEvent(event)">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Date *</label>
-                    <input type="date" id="eventDate" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-800" required>
-                </div>
-                
-                <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Time</label>
-                    <input type="time" id="eventTime" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-800">
-                </div>
-            </div>
-            
-            <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2">Event Title *</label>
-                <input type="text" id="eventTitle" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-800" placeholder="Brief description of the event" required>
-            </div>
-            
-            <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2">Detailed Description</label>
-                <textarea id="eventDescription" rows="4" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-800" placeholder="Provide detailed information about what happened..."></textarea>
-            </div>
-            
-            <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2">Event Category</label>
-                <select id="eventCategory" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-800">
-                    <option value="PARENTING_TIME">Parenting Time & Custody</option>
-                    <option value="CHILD_WELLBEING">Child Wellbeing & Care</option>
-                    <option value="COMMUNICATION">Communication & Co-Parenting</option>
-                    <option value="ORDER_COMPLIANCE">Order Compliance / Non-Compliance</option>
-                    <option value="SAFETY_CONCERN">Safety Concerns</option>
-                    <option value="FINANCIAL">Financial & Support Issues</option>
-                    <option value="LEGAL_EVENT">Legal / Court-Related Event</option>
-                </select>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Impact Level</label>
-                    <select id="impactLevel" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-800">
-                        <option value="low">Low Impact</option>
-                        <option value="medium">Medium Impact</option>
-                        <option value="high">High Impact</option>
-                        <option value="critical">Critical</option>
-                    </select>
-                </div>
-                
-                <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Evidence Type</label>
-                    <input type="text" id="evidenceType" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-800" placeholder="e.g., Text message, Email, Police report">
-                </div>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div class="flex items-center">
-                    <input type="checkbox" id="witnessPresent" class="w-4 h-4 text-blue-800 border-gray-300 rounded focus:ring-blue-800">
-                    <label for="witnessPresent" class="ml-2 text-sm text-gray-700">Witness Present</label>
-                </div>
-                
-                <div class="flex items-center">
-                    <input type="checkbox" id="policeCalled" class="w-4 h-4 text-blue-800 border-gray-300 rounded focus:ring-blue-800">
-                    <label for="policeCalled" class="ml-2 text-sm text-gray-700">Police Called</label>
-                </div>
-            </div>
-            
-            <div class="flex space-x-3">
-                <button type="submit" class="flex-1 bg-blue-800 hover:bg-blue-900 text-white py-3 rounded-lg font-semibold transition duration-300">
-                    Add Event
-                </button>
-                <button type="button" onclick="closeAddEventModal()" class="px-6 py-3 border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition duration-300">
-                    Cancel
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
+class TimelineEvent(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    case_id = db.Column(db.Integer, db.ForeignKey('case.id'), nullable=False)
+    event_date = db.Column(db.Date, nullable=False)
+    event_time = db.Column(db.Time)
+    event_title = db.Column(db.String(200), nullable=False)
+    event_description = db.Column(db.Text)
+    category = db.Column(db.String(50))
+    evidence_type = db.Column(db.String(100))
+    impact_level = db.Column(db.String(20))
+    witness_present = db.Column(db.Boolean, default=False)
+    police_called = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-<script>
-    let currentEvents = [];
+class Document(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    case_id = db.Column(db.Integer, db.ForeignKey('case.id'), nullable=False)
+    filename = db.Column(db.String(255), nullable=False)
+    original_filename = db.Column(db.String(255))
+    document_type = db.Column(db.String(50))
+    upload_date = db.Column(db.DateTime, default=datetime.utcnow)
+    file_size = db.Column(db.Integer)
+    evidence_category = db.Column(db.String(100))
 
-    // Load timeline events on page load
-    document.addEventListener('DOMContentLoaded', function() {
-        loadTimelineEvents();
-    });
+# Routes
+@app.route('/')
+def index():
+    return render_template('index.html')
 
-    async function loadTimelineEvents() {
-        try {
-            const response = await fetch(`/api/timeline_events/{{ case.id }}`);
-            const events = await response.json();
-            currentEvents = events;
-            
-            displayEvents(events);
-            updatePatternAnalysis(events);
-        } catch (error) {
-            console.error('Error loading timeline events:', error);
-        }
-    }
+@app.route('/dashboard')
+def dashboard():
+    if 'user_id' not in session:
+        return redirect(url_for('index'))
+    
+    user = User.query.get(session['user_id'])
+    cases = Case.query.filter_by(user_id=user.id).all()
+    
+    # Get recent timeline events
+    recent_events = []
+    for case in cases:
+        events = TimelineEvent.query.filter_by(case_id=case.id).order_by(TimelineEvent.event_date.desc()).limit(5).all()
+        recent_events.extend(events)
+    
+    recent_events.sort(key=lambda x: x.event_date, reverse=True)
+    
+    # Calculate professional insights
+    insights = calculate_case_insights(cases)
+    
+    return render_template('dashboard.html', user=user, cases=cases, recent_events=recent_events[:5], insights=insights)
 
-    function displayEvents(events) {
-        const container = document.getElementById('timelineEvents');
-        const noEventsMessage = document.getElementById('noEventsMessage');
-        
-        if (events.length === 0) {
-            container.classList.add('hidden');
-            noEventsMessage.classList.remove('hidden');
-            return;
-        }
-        
-        container.classList.remove('hidden');
-        noEventsMessage.classList.add('hidden');
-        
-        container.innerHTML = events.map(event => `
-            <div class="relative pl-8 pb-6 border-l-2 border-gray-200">
-                <div class="absolute -left-3 top-0 w-6 h-6 ${getImpactColor(event.impact_level)} rounded-full border-2 border-white"></div>
-                <div class="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition duration-300">
-                    <div class="flex items-start justify-between">
-                        <div class="flex-1">
-                            <h3 class="text-lg font-semibold text-gray-900">${event.event_title}</h3>
-                            <p class="text-sm text-gray-500 mt-1">${formatDate(event.event_date)} ${event.event_time ? 'at ' + event.event_time : ''}</p>
-                            ${event.event_description ? `<p class="text-gray-700 mt-2">${event.event_description}</p>` : ''}
-                            <div class="flex flex-wrap gap-2 mt-3">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getCategoryColor(event.category)}">
-                                    ${getCategoryLabel(event.category)}
-                                </span>
-                                ${event.evidence_type ? `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">${event.evidence_type}</span>` : ''}
-                                ${event.witness_present ? '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Witness Present</span>' : ''}
-                                ${event.police_called ? '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Police Called</span>' : ''}
-                            </div>
-                        </div>
-                        <div class="ml-4 flex-shrink-0">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getImpactBadgeColor(event.impact_level)}">
-                                ${event.impact_level}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `).join('');
-    }
+@app.route('/timeline/<int:case_id>')
+def timeline(case_id):
+    if 'user_id' not in session:
+        return redirect(url_for('index'))
+    
+    case = Case.query.get_or_404(case_id)
+    events = TimelineEvent.query.filter_by(case_id=case.id).order_by(TimelineEvent.event_date).all()
+    
+    return render_template('timeline.html', case=case, events=events)
 
-    function getCategoryColor(category) {
-        switch(category) {
-            case 'PARENTING_TIME': return 'bg-blue-100 text-blue-800';
-            case 'CHILD_WELLBEING': return 'bg-green-100 text-green-800';
-            case 'COMMUNICATION': return 'bg-yellow-100 text-yellow-800';
-            case 'ORDER_COMPLIANCE': return 'bg-purple-100 text-purple-800';
-            case 'SAFETY_CONCERN': return 'bg-red-100 text-red-800';
-            case 'FINANCIAL': return 'bg-orange-100 text-orange-800';
-            case 'LEGAL_EVENT': return 'bg-indigo-100 text-indigo-800';
-            default: return 'bg-gray-100 text-gray-800';
-        }
-    }
+@app.route('/api/register', methods=['POST'])
+def register():
+    data = request.json
+    email = data.get('email')
+    password = data.get('password')
+    first_name = data.get('first_name', '')
+    last_name = data.get('last_name', '')
+    
+    if User.query.filter_by(email=email).first():
+        return jsonify({'error': 'User already exists'}), 400
+    
+    user = User(
+        email=email,
+        password_hash=generate_password_hash(password),
+        first_name=first_name,
+        last_name=last_name
+    )
+    
+    db.session.add(user)
+    db.session.commit()
+n    
+    session['user_id'] = user.id
+    return jsonify({'success': True, 'user_id': user.id})
 
-    function getCategoryLabel(category) {
-        const labels = {
-            'PARENTING_TIME': 'Parenting Time & Custody',
-            'CHILD_WELLBEING': 'Child Wellbeing & Care',
-            'COMMUNICATION': 'Communication & Co-Parenting',
-            'ORDER_COMPLIANCE': 'Order Compliance',
-            'SAFETY_CONCERN': 'Safety Concerns',
-            'FINANCIAL': 'Financial & Support',
-            'LEGAL_EVENT': 'Legal/Court Event'
-        };
-        return labels[category] || category;
-    }
+@app.route('/api/login', methods=['POST'])
+def login():
+    data = request.json
+    email = data.get('email')
+    password = data.get('password')
+    
+    user = User.query.filter_by(email=email).first()
+    
+    if user and check_password_hash(user.password_hash, password):
+        session['user_id'] = user.id
+        return jsonify({'success': True, 'user_id': user.id})
+    
+    return jsonify({'error': 'Invalid credentials'}), 401
 
-    function getImpactColor(impact) {
-        switch(impact) {
-            case 'high': return 'bg-red-500';
-            case 'medium': return 'bg-yellow-500';
-            case 'critical': return 'bg-purple-500';
-            default: return 'bg-green-500';
-        }
-    }
+@app.route('/api/logout', methods=['POST'])
+def logout():
+    session.pop('user_id', None)
+    return jsonify({'success': True})
 
-    function getImpactBadgeColor(impact) {
-        switch(impact) {
-            case 'high': return 'bg-red-100 text-red-800';
-            case 'medium': return 'bg-yellow-100 text-yellow-800';
-            case 'critical': return 'bg-purple-100 text-purple-800';
-            default: return 'bg-green-100 text-green-800';
-        }
-    }
+@app.route('/api/case', methods=['POST'])
+def create_case():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not authenticated'}), 401
+    
+    data = request.json
+    case = Case(
+        user_id=session['user_id'],
+        case_title=data.get('case_title'),
+        case_focus=data.get('case_type', 'CUSTODY_PARENTING'),
+        legal_domain='FAMILY_LAW'
+    )
+    
+    db.session.add(case)
+    db.session.commit()
+    
+    return jsonify({'success': True, 'case_id': case.id})
 
-    function formatDate(dateString) {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', { 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
-        });
-    }
+@app.route('/api/timeline_event', methods=['POST'])
+def create_timeline_event():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not authenticated'}), 401
+    
+    data = request.json
+    event_date = datetime.strptime(data.get('event_date'), '%Y-%m-%d').date()
+n    \n    event = TimelineEvent(\n        case_id=data.get('case_id'),\n        event_date=event_date,\n        event_title=data.get('event_title'),\n        event_description=data.get('event_description', ''),\n        category=data.get('category', 'PARENTING_TIME'),\n        evidence_type=data.get('evidence_type', ''),\n        impact_level=data.get('impact_level', 'medium'),\n        witness_present=data.get('witness_present', False),\n        police_called=data.get('police_called', False)\n    )\n    \n    db.session.add(event)\n    db.session.commit()\n    \n    return jsonify({'success': True, 'event_id': event.id})
 
-    function updatePatternAnalysis(events) {
-        const highImpactCount = events.filter(e => e.impact_level === 'high' || e.impact_level === 'critical').length;
-        const patternCount = events.filter(e => e.category === 'COMMUNICATION' || e.category === 'SAFETY_CONCERN').length;
-        
-        document.getElementById('highImpactCount').textContent = highImpactCount;
-        document.getElementById('patternCount').textContent = patternCount;
-        
-        let quality = 'Good';
-        if (events.some(e => e.police_called || e.witness_present)) quality = 'Strong';
-        if (events.length > 10 && highImpactCount > 3) quality = 'Very Strong';
-        
-        document.getElementById('evidenceQuality').textContent = quality;
-    }
+@app.route('/api/timeline_events/<int:case_id>')
+ndef get_timeline_events(case_id):\n    if 'user_id' not in session:\n        return jsonify({'error': 'Not authenticated'}), 401\n    \n    events = TimelineEvent.query.filter_by(case_id=case_id).order_by(TimelineEvent.event_date).all()\n    \n    events_data = []\n    for event in events:\n        events_data.append({\n            'id': event.id,\n            'event_date': event.event_date.isoformat(),\n            'event_title': event.event_title,\n            'event_description': event.event_description,\n            'category': event.category,\n            'evidence_type': event.evidence_type,\n            'impact_level': event.impact_level,\n            'witness_present': event.witness_present,\n            'police_called': event.police_called\n        })\n    \n    return jsonify(events_data)
 
-    function showAddEventModal() {
-        document.getElementById('addEventModal').classList.remove('hidden');
-    }
+@app.route('/api/export/<int:case_id>')
+def export_case(case_id):
+n    if 'user_id' not in session:\n        return jsonify({'error': 'Not authenticated'}), 401\n    \n    case = Case.query.get_or_404(case_id)\n    if case.user_id != session['user_id']:\n        return jsonify({'error': 'Unauthorized'}), 403\n    \n    events = TimelineEvent.query.filter_by(case_id=case.id).order_by(TimelineEvent.event_date).all()\n    \n    # Generate professional court-ready document\n    export_data = {\n        'case_title': case.case_title,\n        'case_focus': case.case_focus,\n        'legal_domain': case.legal_domain,\n        'created_date': case.created_at.strftime('%B %d, %Y'),\n        'events': [],\n        'summary': generate_case_summary(events),\n        'pattern_analysis': analyze_patterns(events),\n        'evidence_summary': summarize_evidence(events),\n        'chronology': generate_chronology(events)\n    }\n    \n    for event in events:\n        export_data['events'].append({\n            'date': event.event_date.strftime('%B %d, %Y'),\n            'time': event.event_time.strftime('%I:%M %p') if event.event_time else '',\n            'title': event.event_title,\n            'description': event.event_description,\n            'category': get_category_label(event.category),\n            'impact': event.impact_level,\n            'evidence': event.evidence_type or 'Not specified',\n            'witness': 'Yes' if event.witness_present else 'No',\n            'police': 'Yes' if event.police_called else 'No'\n        })\n    \n    return jsonify(export_data)
 
-    function closeAddEventModal() {
-        document.getElementById('addEventModal').classList.add('hidden');
-        // Reset form
-        document.getElementById('eventDate').value = '';
-        document.getElementById('eventTime').value = '';
-        document.getElementById('eventTitle').value = '';
-        document.getElementById('eventDescription').value = '';
-        document.getElementById('eventCategory').value = 'PARENTING_TIME';
-        document.getElementById('impactLevel').value = 'medium';
-        document.getElementById('witnessPresent').checked = false;
-        document.getElementById('policeCalled').checked = false;
-        document.getElementById('evidenceType').value = '';
-    }
+# Professional Analysis Functions
+def calculate_case_insights(cases):\n    \"\"\"Calculate professional case insights for dashboard\"\"\"\n    insights = {\n        'total_cases': len(cases),\n        'priority_events': 0,\n        'documentation_quality': 'Good',\n        'court_readiness': 'Preparation Phase'\n    }\n    \n    total_events = 0\n    high_impact_events = 0\n    events_with_evidence = 0\n    \n    for case in cases:\n        events = TimelineEvent.query.filter_by(case_id=case.id).all()\n        total_events += len(events)\n        \n        for event in events:\n            if event.impact_level in ['high', 'critical'] or event.police_called:\n                high_impact_events += 1\n            if event.evidence_type:\n                events_with_evidence += 1\n    \n    insights['priority_events'] = high_impact_events\n    \n    # Calculate documentation quality\n    if total_events > 0:\n        evidence_ratio = events_with_evidence / total_events\n        if evidence_ratio > 0.8:\n            insights['documentation_quality'] = 'Excellent'\n        elif evidence_ratio > 0.6:\n            insights['documentation_quality'] = 'Good'\n        elif evidence_ratio > 0.3:\n            insights['documentation_quality'] = 'Fair'\n        else:\n            insights['documentation_quality'] = 'Needs Improvement'\n    \n    # Calculate court readiness\n    if len(cases) > 0 and total_events > 10:\n        insights['court_readiness'] = 'Court Ready'\n    elif len(cases) > 0 and total_events > 5:\n        insights['court_readiness'] = 'Near Ready'\n    \n    return insights\n\ndef generate_case_summary(events):\n    \"\"\"Generate professional paralegal-grade case summary\"\"\"\n    if not events:\n        return {\n            'total_events': 0,\n            'date_range': 'No events recorded',\n            'categories': {},\n            'impact_distribution': {},\n            'key_concerns': [],\n            'recommendations': ['Begin documenting events immediately']\n        }\n    \n    summary = {\n        'total_events': len(events),\n        'date_range': f\"{events[0].event_date.strftime('%B %d, %Y')} to {events[-1].event_date.strftime('%B %d, %Y')}\",\n        'categories': {},\n        'impact_distribution': {},\n        'key_concerns': [],\n        'recommendations': []\n    }\n    \n    for event in events:\n        # Categorize by type\n        category_label = get_category_label(event.category)\n        if category_label not in summary['categories']:\n            summary['categories'][category_label] = 0\n        summary['categories'][category_label] += 1\n        \n        # Impact distribution\n        if event.impact_level not in summary['impact_distribution']:\n            summary['impact_distribution'][event.impact_level] = 0\n        summary['impact_distribution'][event.impact_level] += 1\n        \n        # Key concerns (high impact, police called, etc.)\n        if event.impact_level in ['high', 'critical'] or event.police_called:\n            summary['key_concerns'].append({\n                'date': event.event_date.strftime('%B %d, %Y'),\n                'title': event.event_title,\n                'reason': 'High impact event' if event.impact_level in ['high', 'critical'] else 'Police involvement',\n                'priority': 'Critical' if event.impact_level == 'critical' else 'High'\n            })\n    \n    # Generate recommendations\n    if len(events) < 5:\n        summary['recommendations'].append('Continue documenting events to build stronger case foundation')\n    \n    if len([e for e in events if e.evidence_type]) < len(events) * 0.5:\n        summary['recommendations'].append('Add more evidence documentation to strengthen timeline')\n    \n    if len([e for e in events if e.category in ['SAFETY_CONCERN', 'DOMESTIC_VIOLENCE']]) > 0:\n        summary['recommendations'].append('Consider seeking immediate legal protection due to safety concerns')\n    \n    if len(events) >= 10:\n        summary['recommendations'].append('Timeline shows sufficient documentation for court presentation')\n    \n    return summary\n\ndef analyze_patterns(events):\n    \"\"\"Analyze patterns in timeline events for coercive control and abuse indicators\"\"\"\n    patterns = {\n        'communication_frequency': 0,\n        'safety_concerns': 0,\n        'order_violations': 0,\n        'escalation_indicators': [],\n        'pattern_summary': 'No significant patterns detected'\n    }\n    \n    # Analyze by month\n    monthly_events = defaultdict(list)\n    for event in events:\n        month_key = event.event_date.strftime('%Y-%m')\n        monthly_events[month_key].append(event)\n    \n    # Look for escalation patterns\n    previous_impact = None\n    escalation_count = 0\n    for event in sorted(events, key=lambda x: x.event_date):\n        if previous_impact and event.impact_level in ['high', 'critical'] and previous_impact in ['low', 'medium']:\n            escalation_count += 1\n            patterns['escalation_indicators'].append({\n                'date': event.event_date.strftime('%B %d, %Y'),\n                'title': event.event_title,\n                'from': previous_impact,\n                'to': event.impact_level\n            })\n        previous_impact = event.impact_level\n    \n    # Count categories\n    for event in events:\n        if event.category == 'COMMUNICATION':\n            patterns['communication_frequency'] += 1\n        elif event.category == 'SAFETY_CONCERN':\n            patterns['safety_concerns'] += 1\n        elif event.category == 'ORDER_COMPLIANCE':\n            patterns['order_violations'] += 1\n    \n    # Generate pattern summary\n    if escalation_count > 2:\n        patterns['pattern_summary'] = 'Escalating pattern detected - recommend immediate legal consultation'\n    elif patterns['safety_concerns'] > 3:\n        patterns['pattern_summary'] = 'Multiple safety concerns indicate potential abuse pattern'\n    elif patterns['communication_frequency'] > 10:\n        patterns['pattern_summary'] = 'High frequency of communication issues suggesting coercive control'\n    elif patterns['order_violations'] > 2:\n        patterns['pattern_summary'] = 'Repeated order violations demonstrate non-compliance pattern'\n    else:\n        patterns['pattern_summary'] = 'Events show typical family court case progression'\n    \n    return patterns\n\ndef summarize_evidence(events):\n    \"\"\"Summarize evidence quality and completeness\"\"\"\n    evidence_summary = {\n        'total_events': len(events),\n        'events_with_evidence': 0,\n        'evidence_types': {},\n        'witness_events': 0,\n        'police_events': 0,\n        'quality_score': 0\n    }\n    \n    for event in events:\n        if event.evidence_type:\n            evidence_summary['events_with_evidence'] += 1\n            if event.evidence_type not in evidence_summary['evidence_types']:\n                evidence_summary['evidence_types'][event.evidence_type] = 0\n            evidence_summary['evidence_types'][event.evidence_type] += 1\n        \n        if event.witness_present:\n            evidence_summary['witness_events'] += 1\n        \n        if event.police_called:\n            evidence_summary['police_events'] += 1\n    \n    # Calculate quality score (0-100)\n    if events:\n        evidence_ratio = evidence_summary['events_with_evidence'] / len(events)\n        witness_bonus = min(evidence_summary['witness_events'] / len(events), 0.3)\n        police_bonus = min(evidence_summary['police_events'] / len(events), 0.2)\n        evidence_summary['quality_score'] = int((evidence_ratio + witness_bonus + police_bonus) * 100)\n    \n    return evidence_summary\n\ndef generate_chronology(events):\n    \"\"\"Generate professional chronological summary\"\"\"\n    chronology = []\n    \n    for i, event in enumerate(events, 1):\n        chronology.append({\n            'number': i,\n            'date': event.event_date.strftime('%B %d, %Y'),\n            'title': event.event_title,\n            'category': get_category_label(event.category),\n            'impact': event.impact_level,\n            'days_since_previous': (event.event_date - events[i-1].event_date).days if i > 1 else 0\n        })\n    \n    return chronology\n\ndef get_category_label(category):\n    \"\"\"Get human-readable category labels\"\"\"\n    labels = {\n        'PARENTING_TIME': 'Parenting Time & Custody',\n        'CHILD_WELLBEING': 'Child Wellbeing & Care',\n        'COMMUNICATION': 'Communication & Co-Parenting',\n        'ORDER_COMPLIANCE': 'Order Compliance / Non-Compliance',\n        'SAFETY_CONCERN': 'Safety Concerns',\n        'FINANCIAL': 'Financial & Support Issues',\n        'LEGAL_EVENT': 'Legal / Court-Related Event'\n    }\n    return labels.get(category, category.replace('_', ' ').title())
 
-    async function addTimelineEvent(event) {
-        event.preventDefault();
-        
-        const eventData = {
-            case_id: {{ case.id }},
-            event_date: document.getElementById('eventDate').value,
-            event_time: document.getElementById('eventTime').value,
-            event_title: document.getElementById('eventTitle').value,
-            event_description: document.getElementById('eventDescription').value,
-            category: document.getElementById('eventCategory').value,
-            impact_level: document.getElementById('impactLevel').value,
-            witness_present: document.getElementById('witnessPresent').checked,
-            police_called: document.getElementById('policeCalled').checked,
-            evidence_type: document.getElementById('evidenceType').value
-        };
-        
-        try {
-            const response = await fetch('/api/timeline_event', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(eventData)
-            });
-            
-            const result = await response.json();
-            
-            if (result.success) {
-                closeAddEventModal();
-                loadTimelineEvents();
-            } else {
-                alert('Error adding event. Please try again.');
-            }
-        } catch (error) {
-            alert('Network error. Please try again.');
-        }
-    }
-
-    function exportTimeline() {
-        alert('Export functionality coming soon! This will generate a court-ready PDF document.');
-    }
-    <!-- Add to timeline.html - Professional Timeline View -->
-<div class="timeline-controls mb-6">
-    <button onclick="toggleView('chronological')" class="btn-primary">Chronological</button>
-    <button onclick="toggleView('categorical')" class="btn-secondary">By Category</button>
-    <button onclick="toggleView('impact')" class="btn-secondary">By Impact</button>
-</div>
-
-<div class="timeline-stats mb-6">
-    <div class="grid grid-cols-4 gap-4">
-        <div class="stat-card">
-            <h4>Total Events</h4>
-            <p>{{ events|length }}</p>
-        </div>
-        <div class="stat-card">
-            <h4>High Impact</h4>
-            <p>{{ high_impact_count }}</p>
-        </div>
-        <div class=\"stat-card">
-            <h4>Pattern Indicators</h4>
-            <p>{{ pattern_count }}</p>
-        </div>
-        <div class=\"stat-card">
-            <h4>Evidence Quality</h4>
-            <p>{{ evidence_quality }}</p>
-        </div>
-    </div>
-</div>
-</script>
-{% endblock %}
+if __name__ == '__main__':\n    with app.app_context():\n        db.create_all()\n    app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
