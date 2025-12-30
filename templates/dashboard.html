@@ -3,21 +3,21 @@
 {% block title %}Dashboard - Breaking Badass Legal Docs{% endblock %}
 
 {% block content %}
-<section class="bg-gray-50 py-8">
+<section class="py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Welcome Header -->
         <div class="mb-8 fade-in">
-            <h1 class="text-3xl font-bold text-gray-900">Welcome back, {{ user.first_name }}!</h1>
+            <h1 class="text-3xl font-bold text-primary">Welcome back, {{ user.first_name }}!</h1>
             <p class="text-gray-600 mt-2">Manage your cases and documentation</p>
         </div>
 
         <!-- Stats Overview -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white rounded-lg shadow-lg p-6 fade-in">
+            <div class="bg-white rounded-lg shadow-lg p-6 fade-in border-l-4 border-primary">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                        <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="w-8 h-8 bg-sage rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                             </svg>
                         </div>
@@ -25,17 +25,17 @@
                     <div class="ml-5 w-0 flex-1">
                         <dl>
                             <dt class="text-sm font-medium text-gray-500 truncate">Active Cases</dt>
-                            <dd class="text-lg font-medium text-gray-900">{{ cases|length }}</dd>
+                            <dd class="text-lg font-medium text-primary">{{ cases|length }}</dd>
                         </dl>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg shadow-lg p-6 fade-in">
+            <div class="bg-white rounded-lg shadow-lg p-6 fade-in border-l-4 border-accent">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                        <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="w-8 h-8 bg-accent rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
                         </div>
@@ -43,13 +43,13 @@
                     <div class="ml-5 w-0 flex-1">
                         <dl>
                             <dt class="text-sm font-medium text-gray-500 truncate">Timeline Events</dt>
-                            <dd class="text-lg font-medium text-gray-900">{{ recent_events|length }}</dd>
+                            <dd class="text-lg font-medium text-primary">{{ recent_events|length }}</dd>
                         </dl>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg shadow-lg p-6 fade-in">
+            <div class="bg-white rounded-lg shadow-lg p-6 fade-in border-l-4 border-yellow-400">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
                         <div class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
@@ -61,13 +61,13 @@
                     <div class="ml-5 w-0 flex-1">
                         <dl>
                             <dt class="text-sm font-medium text-gray-500 truncate">Evidence Strength</dt>
-                            <dd class="text-lg font-medium text-gray-900">Strong</dd>
+                            <dd class="text-lg font-medium text-primary">Strong</dd>
                         </dl>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg shadow-lg p-6 fade-in">
+            <div class="bg-white rounded-lg shadow-lg p-6 fade-in border-l-4 border-purple-400">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
                         <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -79,7 +79,7 @@
                     <div class="ml-5 w-0 flex-1">
                         <dl>
                             <dt class="text-sm font-medium text-gray-500 truncate">Subscription</dt>
-                            <dd class="text-lg font-medium text-gray-900 capitalize">{{ user.subscription_tier }}</dd>
+                            <dd class="text-lg font-medium text-primary capitalize">{{ user.subscription_tier }}</dd>
                         </dl>
                     </div>
                 </div>
@@ -88,24 +88,24 @@
 
         <!-- Quick Actions -->
         <div class="mb-8">
-            <div class="bg-white rounded-lg shadow-lg p-6 fade-in">
-                <h2 class="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
+            <div class="bg-white rounded-lg shadow-lg p-6 fade-in border border-sage">
+                <h2 class="text-xl font-semibold text-primary mb-4">Quick Actions</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <button onclick="showCreateCaseModal()" class="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-800 hover:bg-blue-50 transition duration-300">
+                    <button onclick="showCreateCaseModal()" class="flex items-center justify-center p-4 border-2 border-dashed border-sage rounded-lg hover:border-primary hover:bg-sage hover:text-white transition duration-300">
                         <svg class="w-6 h-6 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m-6-6h6m-6 0H6"></path>
                         </svg>
                         <span class="text-gray-600 font-medium">Create New Case</span>
                     </button>
                     
-                    <button onclick="showUploadModal()" class="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-800 hover:bg-blue-50 transition duration-300">
+                    <button onclick="showUploadModal()" class="flex items-center justify-center p-4 border-2 border-dashed border-sage rounded-lg hover:border-primary hover:bg-sage hover:text-white transition duration-300">
                         <svg class="w-6 h-6 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                         </svg>
                         <span class="text-gray-600 font-medium">Upload Document</span>
                     </button>
                     
-                    <button onclick="showTimelineModal()" class="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-800 hover:bg-blue-50 transition duration-300">
+                    <button onclick="showTimelineModal()" class="flex items-center justify-center p-4 border-2 border-dashed border-sage rounded-lg hover:border-primary hover:bg-sage hover:text-white transition duration-300">
                         <svg class="w-6 h-6 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
@@ -118,13 +118,13 @@
         <!-- Recent Activity -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <!-- Recent Timeline Events -->
-            <div class="bg-white rounded-lg shadow-lg p-6 fade-in">
-                <h2 class="text-xl font-semibold text-gray-900 mb-4">Recent Timeline Events</h2>
+            <div class="bg-white rounded-lg shadow-lg p-6 fade-in border border-sage">
+                <h2 class="text-xl font-semibold text-primary mb-4">Recent Timeline Events</h2>
                 <div class="space-y-4">
                     {% if recent_events %}
                         {% for event in recent_events[:5] %}
                         <div class="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-lg">
-                            <div class="flex-shrink-0 w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                            <div class="flex-shrink-0 w-2 h-2 bg-primary rounded-full mt-2"></div>
                             <div class="flex-1">
                                 <p class="text-sm font-medium text-gray-900">{{ event.event_title }}</p>
                                 <p class="text-sm text-gray-500">{{ event.event_date.strftime('%B %d, %Y') }}</p>
@@ -137,13 +137,13 @@
                     {% endif %}
                 </div>
                 <div class="mt-6">
-                    <a href="#" class="text-blue-800 hover:underline font-medium">View all timeline events →</a>
+                    <a href="#" class="text-primary hover:underline font-medium">View all timeline events →</a>
                 </div>
             </div>
 
             <!-- Active Cases -->
-            <div class="bg-white rounded-lg shadow-lg p-6 fade-in">
-                <h2 class="text-xl font-semibold text-gray-900 mb-4">Active Cases</h2>
+            <div class="bg-white rounded-lg shadow-lg p-6 fade-in border border-sage">
+                <h2 class="text-xl font-semibold text-primary mb-4">Active Cases</h2>
                 <div class="space-y-4">
                     {% if cases %}
                         {% for case in cases %}
@@ -153,7 +153,7 @@
                                 <p class="text-xs text-gray-500">{{ case.case_focus|replace('_', ' ')|title }}</p>
                                 <p class="text-xs text-gray-400">{{ case.created_at.strftime('%B %d, %Y') }}</p>
                             </div>
-                            <a href="{{ url_for('timeline', case_id=case.id) }}" class="text-blue-800 hover:underline text-sm font-medium">View Timeline</a>
+                            <a href="{{ url_for('timeline', case_id=case.id) }}" class="text-primary hover:underline text-sm font-medium">View Timeline</a>
                         </div>
                         {% endfor %}
                     {% else %}
@@ -161,7 +161,7 @@
                     {% endif %}
                 </div>
                 <div class="mt-6">
-                    <button onclick="showCreateCaseModal()" class="text-blue-800 hover:underline font-medium">Create new case →</button>
+                    <button onclick="showCreateCaseModal()" class="text-primary hover:underline font-medium">Create new case →</button>
                 </div>
             </div>
         </div>
@@ -170,9 +170,9 @@
 
 <!-- Create Case Modal -->
 <div id="createCaseModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
-    <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+    <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4 border-2 border-primary">
         <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold text-gray-900">Create New Case</h2>
+            <h2 class="text-2xl font-bold text-primary">Create New Case</h2>
             <button onclick="closeCreateCaseModal()" class="text-gray-400 hover:text-gray-600">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -183,12 +183,12 @@
         <form onsubmit="createCase(event)">
             <div class="mb-4">
                 <label class="block text-gray-700 text-sm font-bold mb-2">Case Title</label>
-                <input type="text" id="caseTitle" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-800" placeholder="e.g., Smith v. Smith Custody Case" required>
+                <input type="text" id="caseTitle" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="e.g., Smith v. Smith Custody Case" required>
             </div>
             
             <div class="mb-6">
                 <label class="block text-gray-700 text-sm font-bold mb-2">Case Focus</label>
-                <select id="caseType" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-800">
+                <select id="caseType" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
                     <option value="CUSTODY_PARENTING">Custody & Parenting Time</option>
                     <option value="DOMESTIC_VIOLENCE">Domestic Violence / Abuse</option>
                     <option value="DIVORCE_SEPARATION">Divorce / Separation</option>
@@ -198,7 +198,7 @@
                 <p class="text-xs text-gray-500 mt-1">Select the primary issue you are documenting. You can track multiple issues inside one case.</p>
             </div>
             
-            <button type="submit" class="w-full bg-blue-800 hover:bg-blue-900 text-white py-3 rounded-lg font-semibold transition duration-300">
+            <button type="submit" class="w-full bg-primary hover:bg-gray-800 text-white py-3 rounded-lg font-semibold transition duration-300">
                 Create Case
             </button>
         </form>
