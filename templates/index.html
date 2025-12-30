@@ -1,312 +1,319 @@
-{% extends "base.html" %}
-
-{% block title %}Breaking Badass Legal Docs - Professional Documentation Platform{% endblock %}
-
-{% block content %}
-<!-- Hero Section -->
-<section class="hero-gradient text-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-        <div class="text-center fade-in">
-            <h1 class="text-5xl font-bold mb-6">Professional Legal Documentation Made Simple</h1>
-            <p class="text-xl mb-8 max-w-3xl mx-auto">Transform your family court preparation with paralegal-grade documentation tools. Organize evidence, create timelines, and build compelling cases that attorneys and judges understand.</p>
-            <div class="space-x-4">
-                <button onclick="showSignupModal()" class="btn-primary">Get Started Free</button>
-                <a href="#features" class="btn-secondary">Learn More</a>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Features Section -->
-<section id="features" class="py-20">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-16 fade-in">
-            <h2 class="text-4xl font-bold text-primary mb-4">Why Choose Our Platform?</h2>
-            <p class="text-xl text-gray-600 max-w-3xl mx-auto">Built by a paralegal with 20+ years of experience, specifically designed for family court documentation and coercive control cases.</p>
-        </div>
-
-        <div class="grid md:grid-cols-3 gap-8">
-            <div class="bg-white p-8 rounded-lg shadow-lg fade-in border-l-4 border-primary">
-                <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-6">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
-                </div>
-                <h3 class="text-2xl font-semibold text-gray-900 mb-4">Document Organization</h3>
-                <p class="text-gray-600">Upload and categorize evidence with smart tagging and organization features designed for legal proceedings.</p>
-            </div>
-
-            <div class="bg-white p-8 rounded-lg shadow-lg fade-in border-l-4 border-accent">
-                <div class="w-12 h-12 bg-accent rounded-lg flex items-center justify-center mb-6">
-                    <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </div>
-                <h3 class="text-2xl font-semibold text-gray-900 mb-4">Timeline Creation</h3>
-                <p class="text-gray-600">Build comprehensive chronologies showing patterns of coercive control and abuse for pre-litigation preparation.</p>
-            </div>
-
-            <div class="bg-white p-8 rounded-lg shadow-lg fade-in border-l-4 border-sage">
-                <div class="w-12 h-12 bg-sage rounded-lg flex items-center justify-center mb-6">
-                    <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </div>
-                <h3 class="text-2xl font-semibold text-gray-900 mb-4">Court-Ready Output</h3>
-                <p class="text-gray-600">Generate professional documentation packages that attorneys, GALs, and judges will read and understand.</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Pricing Section -->
-<section id="pricing" class="bg-gray-100 py-20">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-16 fade-in">
-            <h2 class="text-4xl font-bold text-primary mb-4">Choose Your Plan</h2>
-            <p class="text-xl text-gray-600">Start documenting your case today with our professional tools.</p>
-        </div>
-
-        <div class="grid md:grid-cols-3 gap-8">
-            <!-- Basic Plan -->
-            <div class="bg-white p-8 rounded-lg shadow-lg fade-in border-l-4 border-primary">
-                <h3 class="text-2xl font-bold text-gray-900 mb-4">Basic Documentation</h3>
-                <div class="mb-6">
-                    <span class="text-4xl font-bold text-gray-900">$29</span>
-                    <span class="text-gray-600">/month</span>
-                </div>
-                <ul class="space-y-3 mb-8">
-                    <li class="flex items-center">
-                        <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                        </svg>
-                        Up to 3 active cases
-                    </li>
-                    <li class="flex items-center">
-                        <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                        </svg>
-                        Basic timeline builder
-                    </li>
-                    <li class="flex items-center">
-                        <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                        </svg>
-                        Document storage (5GB)
-                    </li>
-                    <li class="flex items-center">
-                        <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                        </svg>
-                        Email support
-                    </li>
-                </ul>
-                <button onclick="showSignupModal()" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 rounded-lg font-semibold transition duration-300">Start Free Trial</button>
-            </div>
-
-            <!-- Professional Plan -->
-            <div class="bg-white rounded-lg shadow-lg p-8 border-2 border-primary fade-in">
-                <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <span class="bg-primary text-white px-4 py-1 rounded-full text-sm font-semibold">Most Popular</span>
-                </div>
-                <h3 class="text-2xl font-bold text-gray-900 mb-4">Professional</h3>
-                <div class="mb-6">
-                    <span class="text-4xl font-bold text-gray-900">$79</span>
-                    <span class="text-gray-600">/month</span>
-                </div>
-                <ul class="space-y-3 mb-8">
-                    <li class="flex items-center">
-                        <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                        </svg>
-                        Unlimited active cases
-                    </li>
-                    <li class="flex items-center">
-                        <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                        </svg>
-                        Advanced timeline with pattern analysis
-                    </li>
-                    <li class="flex items-center">
-                        <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                        </svg>
-                        Document storage (50GB)
-                    </li>
-                    <li class="flex items-center">
-                        <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                        </svg>
-                        Priority email & chat support
-                    </li>
-                    <li class="flex items-center">
-                        <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                        </svg>
-                        Court-ready export formats
-                    </li>
-                </ul>
-                <button onclick="showSignupModal()" class="w-full bg-primary hover:bg-gray-800 text-white py-3 rounded-lg font-semibold transition duration-300">Start Free Trial</button>
-            </div>
-
-            <!-- Premium Plan -->
-            <div class="bg-white rounded-lg shadow-lg p-8 fade-in border-l-4 border-sage">
-                <h3 class="text-2xl font-bold text-gray-900 mb-4">Premium Plus</h3>
-                <div class="mb-6">
-                    <span class="text-4xl font-bold text-gray-900">$149</span>
-                    <span class="text-gray-600">/month</span>
-                </div>
-                <ul class="space-y-3 mb-8">
-                    <li class="flex items-center">
-                        <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                        </svg>
-                        Everything in Professional
-                    </li>
-                    <li class="flex items-center">
-                        <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                        </svg>
-                        Advanced pattern recognition
-                    </li>
-                    <li class="flex items-center">
-                        <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                        </svg>
-                        Document storage (200GB)
-                    </li>
-                    <li class="flex items-center">
-                        <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                        </svg>
-                        Priority email & chat support
-                    </li>
-                    <li class="flex items-center">
-                        <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                        </svg>
-                        Attorney collaboration tools
-                    </li>
-                </ul>
-                <button onclick="showSignupModal()" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 rounded-lg font-semibold transition duration-300">Start Free Trial</button>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Login/Signup Modal -->
-<div id="authModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
-    <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4 border-2 border-primary">
-        <div class="flex justify-between items-center mb-6">
-            <h2 id="modalTitle" class="text-2xl font-bold text-primary">Sign Up</h2>
-            <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-            </button>
-        </div>
-        
-        <form id="authForm" onsubmit="handleAuth(event)">
-            <div id="signupFields">
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">First Name</label>
-                    <input type="text" id="firstName" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" required>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Last Name</label>
-                    <input type="text" id="lastName" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" required>
-                </div>
-            </div>
-            
-            <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
-                <input type="email" id="email" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" required>
-            </div>
-            
-            <div class="mb-6">
-                <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
-                <input type="password" id="password" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" required>
-            </div>
-            
-            <button type="submit" class="btn-primary w-full">
-                <span id="submitText">Sign Up</span>
-            </button>
-        </form>
-        
-        <p class="mt-4 text-center text-gray-600">
-            <span id="switchText">Already have an account?</span>
-            <button onclick="toggleAuthMode()" id="switchButton" class="text-primary hover:underline font-semibold">Log In</button>
-        </p>
-    </div>
-</div>
-
-<script>
-    let isLoginMode = false;
-
-    function showSignupModal() {
-        document.getElementById('authModal').classList.remove('hidden');
-    }
-
-    function closeModal() {
-        document.getElementById('authModal').classList.add('hidden');
-    }
-
-    function toggleAuthMode() {
-        isLoginMode = !isLoginMode;
-        const modalTitle = document.getElementById('modalTitle');
-        const submitText = document.getElementById('submitText');
-        const switchText = document.getElementById('switchText');
-        const switchButton = document.getElementById('switchButton');
-        const signupFields = document.getElementById('signupFields');
-        
-        if (isLoginMode) {
-            modalTitle.textContent = 'Log In';
-            submitText.textContent = 'Log In';
-            switchText.textContent = "Don't have an account?";
-            switchButton.textContent = 'Sign Up';
-            signupFields.style.display = 'none';
-        } else {
-            modalTitle.textContent = 'Sign Up';
-            submitText.textContent = 'Sign Up';
-            switchText.textContent = 'Already have an account?';
-            switchButton.textContent = 'Log In';
-            signupFields.style.display = 'block';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Breaking Badass Legal Docs - Professional Documentation Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #F7F3EF; /* Warm neutral background */
         }
-    }
-
-    async function handleAuth(event) {
-        event.preventDefault();
-        
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        
-        let endpoint = '/api/login';
-        let data = { email, password };
-        
-        if (!isLoginMode) {
-            const firstName = document.getElementById('firstName').value;
-            const lastName = document.getElementById('lastName').value;
-            endpoint = '/api/register';
-            data = { email, password, first_name: firstName, last_name: lastName };
+        .hero-gradient { 
+            background: linear-gradient(135deg, #5D654E 0%, #000000 100%); /* Dark green to black */
         }
-        
-        try {
-            const response = await fetch(endpoint, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
+        .text-primary { color: #5D654E; /* Dark green */ }
+        .bg-primary { background-color: #5D654E; /* Dark green */ }
+        .bg-secondary { background-color: #000000; /* Black */ }
+        .text-accent { color: #ECCDC2; /* Dusty rose */ }
+        .bg-accent { background-color: #ECCDC2; /* Dusty rose */ }
+        .bg-sage { background-color: #C3CABC; /* Sage green */ }
+        .border-primary { border-color: #5D654E; /* Dark green */ }
+        .btn-primary { 
+            background-color: #5D654E; 
+            color: white; 
+            padding: 0.75rem 1.5rem; 
+            border-radius: 0.375rem; 
+            font-weight: 500; 
+            transition: background-color 0.3s ease; 
+        }
+        .btn-primary:hover { background-color: #4a5540; }
+        .btn-secondary { 
+            background-color: #000000; 
+            color: white; 
+            padding: 0.75rem 1.5rem; 
+            border-radius: 0.375rem; 
+            font-weight: 500; 
+            transition: background-color 0.3s ease; 
+        }
+        .btn-secondary:hover { background-color: #333333; }
+        .card-shadow { box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .nav-link {
+            color: #374151;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        .nav-link:hover {
+            color: #5D654E;
+        }
+    </style>
+</head>
+<body class="bg-warm-neutral">
+    <div class="min-h-screen">
+        <!-- Navigation -->
+        <nav class="bg-white shadow-lg border-b-2 border-primary">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <h1 class="text-2xl font-bold text-primary">Breaking Badass Legal Docs</h1>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        {% if session.user_id %}
+                        <a href="/dashboard" class="nav-link">Dashboard</a>
+                        {% else %}
+                        <a href="#" onclick="showSignupModal()" class="nav-link">Home</a>
+                        <a href="#pricing" class="nav-link">Pricing</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main>
+            <!-- Hero Section -->
+            <section class="hero-gradient text-white">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+                    <div class="text-center fade-in">
+                        <h1 class="text-5xl font-bold mb-6">Professional Legal Documentation Made Simple</h1>
+                        <p class="text-xl mb-8 max-w-3xl mx-auto">Transform your family court preparation with paralegal-grade documentation tools. Organize evidence, create timelines, and build compelling cases that attorneys and judges understand.</p>
+                        <div class="space-x-4">
+                            <button onclick="showSignupModal()" class="btn-primary">Get Started Free</button>
+                            <a href="#features" class="btn-secondary">Learn More</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Features Section -->
+            <section id="features" class="py-20">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="text-center mb-16 fade-in">
+                        <h2 class="text-4xl font-bold text-primary mb-4">Why Choose Our Platform?</h2>
+                        <p class="text-xl text-gray-600 max-w-3xl mx-auto">Built by a paralegal with 20+ years of experience, specifically designed for family court documentation and coercive control cases.</p>
+                    </div>
+
+                    <div class="grid md:grid-cols-3 gap-8">
+                        <div class="bg-white p-8 rounded-lg shadow-lg fade-in border-l-4 border-primary">
+                            <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-6">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-2xl font-semibold text-gray-900 mb-4">Document Organization</h3>
+                            <p class="text-gray-600">Upload and categorize evidence with smart tagging and organization features designed for legal proceedings.</p>
+                        </div>
+
+                        <div class="bg-white p-8 rounded-lg shadow-lg fade-in border-l-4 border-accent">
+                            <div class="w-12 h-12 bg-accent rounded-lg flex items-center justify-center mb-6">
+                                <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-2xl font-semibold text-gray-900 mb-4">Timeline Creation</h3>
+                            <p class="text-gray-600">Build comprehensive chronologies showing patterns of coercive control and abuse for pre-litigation preparation.</p>
+                        </div>
+
+                        <div class="bg-white p-8 rounded-lg shadow-lg fade-in border-l-4 border-sage">
+                            <div class="w-12 h-12 bg-sage rounded-lg flex items-center justify-center mb-6">
+                                <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-2xl font-semibold text-gray-900 mb-4">Court-Ready Export</h3>
+                            <p class="text-gray-600">Generate professional reports and timelines formatted for legal proceedings and attorney review.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CTA Section -->
+            <section class="py-20 bg-sage">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                    <div class="fade-in">
+                        <h2 class="text-4xl font-bold text-primary mb-4">Ready to Get Started?</h2>
+                        <p class="text-xl text-gray-700 mb-8 max-w-2xl mx-auto">Join thousands of parents who trust our platform to organize their family court documentation.</p>
+                        <button onclick="showSignupModal()" class="btn-primary text-lg px-8 py-4">Start Your Free Account</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-secondary text-white mt-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div class="text-center">
+                    <p>&copy; 2024 Breaking Badass Coaching. All rights reserved.</p>
+                    <p class="mt-2 text-gray-400">Professional Legal Documentation Platform</p>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Login/Signup Modal -->
+        <div id="authModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+            <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4 border-2 border-primary">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 id="modalTitle" class="text-2xl font-bold text-primary">Sign Up</h2>
+                    <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <form id="authForm" onsubmit="handleAuth(event)">
+                    <!-- Login Fields (visible by default) -->
+                    <div id="loginFields">
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Email *</label>
+                            <input type="email" id="email" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" required>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Password *</label>
+                            <input type="password" id="password" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" required>
+                        </div>
+                    </div>
+
+                    <!-- Signup Fields (hidden by default) -->
+                    <div id="signupFields" style="display: none;">
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">First Name *</label>
+                            <input type="text" id="firstName" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Last Name *</label>
+                            <input type="text" id="lastName" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Email *</label>
+                            <input type="email" id="email" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Password *</label>
+                            <input type="password" id="password" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary w-full">
+                        <span id="submitText">Sign Up</span>
+                    </button>
+                </form>
+                
+                <p class="mt-4 text-center text-gray-600">
+                    <span id="switchText">Already have an account?</span>
+                    <button onclick="toggleAuthMode()" id="switchButton" class="text-primary hover:underline font-semibold">Log In</button>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isLoginMode = false;
+
+        function showSignupModal() {
+            document.getElementById('authModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('authModal').classList.add('hidden');
+        }
+
+        function toggleAuthMode() {
+            isLoginMode = !isLoginMode;
+            const modalTitle = document.getElementById('modalTitle');
+            const submitText = document.getElementById('submitText');
+            const switchText = document.getElementById('switchText');
+            const switchButton = document.getElementById('switchButton');
+            const loginFields = document.getElementById('loginFields');
+            const signupFields = document.getElementById('signupFields');
             
-            const result = await response.json();
-            
-            if (result.success) {
-                window.location.href = '/dashboard';
+            if (isLoginMode) {
+                modalTitle.textContent = 'Log In';
+                submitText.textContent = 'Log In';
+                switchText.textContent = "Don't have an account?";
+                switchButton.textContent = 'Sign Up';
+                loginFields.style.display = 'block';
+                signupFields.style.display = 'none';
             } else {
-                alert(result.error || 'Authentication failed');
+                modalTitle.textContent = 'Sign Up';
+                submitText.textContent = 'Sign Up';
+                switchText.textContent = 'Already have an account?';
+                switchButton.textContent = 'Log In';
+                loginFields.style.display = 'none';
+                signupFields.style.display = 'block';
             }
-        } catch (error) {
-            alert('Network error. Please try again.');
         }
-    }
-</script>
-{% endblock %}
+
+        async function handleAuth(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            let endpoint = '/api/login';
+            let data = { email, password };
+            
+            if (!isLoginMode) {
+                const firstName = document.getElementById('firstName').value;
+                const lastName = document.getElementById('lastName').value;
+                endpoint = '/api/register';
+                data = { email, password, first_name: firstName, last_name: lastName };
+            }
+            
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    window.location.href = '/dashboard';
+                } else {
+                    alert(result.error || 'Authentication failed');
+                }
+            } catch (error) {
+                alert('Network error. Please try again.');
+            }
+        }
+
+        // Initialize fade-in animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const fadeElements = document.querySelectorAll('.fade-in');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry, index) => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => {
+                            entry.target.classList.add('visible');
+                        }, index * 100);
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            fadeElements.forEach(element => {
+                observer.observe(element);
+            });
+        });
+    </script>
+</body>
+</html>
