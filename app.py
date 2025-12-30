@@ -86,7 +86,7 @@ def index():
         return render_template('index.html')
     except Exception as e:
         logger.error(f"Error rendering index: {str(e)}")
-n        return "Internal Server Error", 500
+        return "Internal Server Error", 500
 
 @app.route('/dashboard')
 def dashboard():
@@ -299,65 +299,4 @@ def create_timeline_event():
         return jsonify({'error': 'Timeline event creation failed'}), 500
 
 @app.route('/api/timeline_events/<int:case_id>')
-def get_timeline_events(case_id):
-    try:
-        if 'user_id' not in session:
-            return jsonify({'error': 'Not authenticated'}), 401
-        
-        # Verify case exists and belongs to user
-        case = Case.query.get(case_id)
-        if not case or case.user_id != session['user_id']:
-            return jsonify({'error': 'Case not found or access denied'}), 404
-        
-        events = TimelineEvent.query.filter_by(case_id=case_id).order_by(TimelineEvent.event_date).all()
-        
-        events_data = []
-        for event in events:
-            events_data.append({
-                'id': event.id,
-                'event_date': event.event_date.isoformat(),
-                'event_title': event.event_title,
-                'event_description': event.event_description,
-                'category': event.category,
-                'evidence_type': event.evidence_type,
-                'impact_level': event.impact_level,
-                'witness_present': event.witness_present,
-                'police_called': event.police_called,
-                'created_at': event.created_at.isoformat()
-            })
-        
-        return jsonify(events_data)
-        
-    except Exception as e:
-        logger.error(f"Get timeline events error: {str(e)}")
-        return jsonify({'error': 'Failed to retrieve timeline events'}), 500
-
-# Error handlers
-@app.errorhandler(404)
-ndef not_found(error):
-    return render_template('index.html'), 404
-
-@app.errorhandler(500)
-def internal_error(error):
-    logger.error(f"Internal server error: {str(error)}")
-    return "Internal Server Error", 500
-
-# Health check endpoint for Heroku
-@app.route('/health')
-def health_check():
-    return jsonify({'status': 'healthy', 'timestamp': datetime.utcnow().isoformat()}), 200
-
-# Production entry point
-if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    debug = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
-    
-    # Initialize database
-    with app.app_context():
-        try:
-            db.create_all()
-            logger.info("Database initialized successfully")
-        except Exception as e:
-            logger.error(f"Database initialization error: {str(e)}")
-    
-    app.run(debug=debug, host='0.0.0.0', port=port)
+def get_timeline_events(case_id
