@@ -10,8 +10,8 @@
             <h1 class="text-5xl font-bold mb-6">Professional Legal Documentation Made Simple</h1>
             <p class="text-xl mb-8 max-w-3xl mx-auto">Transform your family court preparation with paralegal-grade documentation tools. Organize evidence, create timelines, and build compelling cases that attorneys and judges understand.</p>
             <div class="space-x-4">
-                <button onclick="showSignupModal()" class="bg-accent hover:bg-sage text-primary px-8 py-3 rounded-lg font-semibold text-lg transition duration-300">Get Started Free</button>
-                <a href="#features" class="bg-transparent border-2 border-white hover:bg-white hover:text-secondary text-white px-8 py-3 rounded-lg font-semibold text-lg transition duration-300">Learn More</a>
+                <button onclick="showSignupModal()" class="btn-primary">Get Started Free</button>
+                <a href="#features" class="btn-secondary">Learn More</a>
             </div>
         </div>
     </div>
@@ -26,7 +26,7 @@
         </div>
 
         <div class="grid md:grid-cols-3 gap-8">
-            <div class="bg-white p-8 rounded-lg shadow-lg fade-in">
+            <div class="bg-white p-8 rounded-lg shadow-lg fade-in border-l-4 border-primary">
                 <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-6">
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -36,9 +36,9 @@
                 <p class="text-gray-600">Upload and categorize evidence with smart tagging and organization features designed for legal proceedings.</p>
             </div>
 
-            <div class="bg-white p-8 rounded-lg shadow-lg fade-in">
-                <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-6">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="bg-white p-8 rounded-lg shadow-lg fade-in border-l-4 border-accent">
+                <div class="w-12 h-12 bg-accent rounded-lg flex items-center justify-center mb-6">
+                    <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                 </div>
@@ -46,9 +46,9 @@
                 <p class="text-gray-600">Build comprehensive chronologies showing patterns of coercive control and abuse for pre-litigation preparation.</p>
             </div>
 
-            <div class="bg-white p-8 rounded-lg shadow-lg fade-in">
-                <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-6">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="bg-white p-8 rounded-lg shadow-lg fade-in border-l-4 border-sage">
+                <div class="w-12 h-12 bg-sage rounded-lg flex items-center justify-center mb-6">
+                    <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                 </div>
@@ -69,7 +69,7 @@
 
         <div class="grid md:grid-cols-3 gap-8">
             <!-- Basic Plan -->
-            <div class="bg-white rounded-lg shadow-lg p-8 fade-in">
+            <div class="bg-white rounded-lg shadow-lg p-8 fade-in border-l-4 border-primary">
                 <h3 class="text-2xl font-bold text-gray-900 mb-4">Basic Documentation</h3>
                 <div class="mb-6">
                     <span class="text-4xl font-bold text-gray-900">$29</span>
@@ -150,7 +150,7 @@
             </div>
 
             <!-- Premium Plan -->
-            <div class="bg-white rounded-lg shadow-lg p-8 fade-in">
+            <div class="bg-white rounded-lg shadow-lg p-8 fade-in border-l-4 border-sage">
                 <h3 class="text-2xl font-bold text-gray-900 mb-4">Premium Plus</h3>
                 <div class="mb-6">
                     <span class="text-4xl font-bold text-gray-900">$149</span>
@@ -196,9 +196,9 @@
 
 <!-- Login/Signup Modal -->
 <div id="authModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
-    <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+    <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4 border-2 border-primary">
         <div class="flex justify-between items-center mb-6">
-            <h2 id="modalTitle" class="text-2xl font-bold text-gray-900">Sign Up</h2>
+            <h2 id="modalTitle" class="text-2xl font-bold text-primary">Sign Up</h2>
             <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -228,7 +228,7 @@
                 <input type="password" id="password" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" required>
             </div>
             
-            <button type="submit" class="w-full bg-primary hover:bg-gray-800 text-white py-3 rounded-lg font-semibold transition duration-300">
+            <button type="submit" class="btn-primary w-full">
                 <span id="submitText">Sign Up</span>
             </button>
         </form>
