@@ -17,26 +17,26 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 
 # Production-ready configuration
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key-here')
 
 # Database configuration - Heroku compatible
 if os.environ.get('DATABASE_URL'):
-    # Heroku PostgreSQL
+    # Heroku PostgreSQL - fix the postgres:// to postgresql://
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL').replace("postgres://", "postgresql://", 1)
+    logger.info("Using PostgreSQL database")
 else:
     # Local development
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///legaldocs.db'
+    logger.info("Using SQLite database")
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['WTF_CSRF_ENABLED'] = True
-app.config['WTF_CSRF_SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key')
+app.config['WTF_CSRF_ENABLED'] = False  # Disable CSRF for API endpoints
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
 # Initialize extensions
 db = SQLAlchemy(app)
 CORS(app, supports_credentials=True)
-csrf = CSRFProtect(app)
 
 # Database Models
 class User(db.Model):
@@ -108,4 +108,140 @@ def dashboard():
         # Get recent timeline events
         recent_events = []
         for case in cases:
-            events = TimelineEvent.query.filter_by(case_id
+            events = TimelineEvent.query.filter_by(case_id=case.id).order_by(TimelineEvent.event_date.desc()).limit(5).all()
+            recent_events.extend(events)
+        
+        recent_events.sort(key=lambda x: x.event_date, reverse=True)
+        
+        return render_template('dashboard.html', user=user, cases=cases, recent_events=recent_events[:5])
+    except Exception as e:
+        logger.error(f"Error rendering dashboard: {str(e)}")
+        return "Internal Server Error", 500
+
+@app.route('/timeline/<int:case_id>')
+def timeline(case_id):
+    try:
+        if 'user_id' not in session:
+            return redirect(url_for('index'))
+        
+        case = Case.query.get_or_404(case_id)
+        
+        # Verify user owns this case
+        if case.user_id != session['user_id']:
+            return redirect(url_for('dashboard'))
+        
+        events = TimelineEvent.query.filter_by(case_id=case.id).order_by(TimelineEvent.event_date).all()
+        
+        return render_template('timeline.html', case=case, events=events)
+    except Exception as e:
+        logger.error(f"Error rendering timeline: {str(e)}")
+        return "Internal Server Error", 500
+
+# API Routes
+@app.route('/api/register', methods=['POST'])
+def register():
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+            
+        email = data.get('email', '').strip().lower()
+        password = data.get('password', '')
+        first_name = data.get('first_name', '').strip()
+        last_name = data.get('last_name', '').strip()
+        
+        # Validation
+        if not email or not password:
+            return jsonify({'error': 'Email and password are required'}), 400
+        
+        if len(password) < 6:
+            return jsonify({'error': 'Password must be at least 6 characters'}), 400
+        
+        # Check if user exists
+        if User.query.filter_by(email=email).first():
+            return jsonify({'error': 'User already exists'}), 400
+        
+        # Create user
+        user = User(
+            email=email,
+            password_hash=generate_password_hash(password),
+            first_name=first_name,
+            last_name=last_name
+        )
+        
+        db.session.add(user)
+        db.session.commit()
+        
+        session['user_id'] = user.id
+        logger.info(f"User registered: {email}")
+        return jsonify({'success': True, 'user_id': user.id})
+        
+    except Exception as e:
+        logger.error(f"Registration error: {str(e)}")
+        db.session.rollback()
+        return jsonify({'error': 'Registration failed'}), 500
+
+@app.route('/api/login', methods=['POST'])
+def login():
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+            
+        email = data.get('email', '').strip().lower()
+        password = data.get('password', '')
+        
+        if not email or not password:
+            return jsonify({'error': 'Email and password are required'}), 400
+        
+        user = User.query.filter_by(email=email).first()
+        
+        if user and check_password_hash(user.password_hash, password):
+            session['user_id'] = user.id
+            logger.info(f"User logged in: {email}")
+            return jsonify({'success': True, 'user_id': user.id})
+        
+        return jsonify({'error': 'Invalid credentials'}), 401
+        
+    except Exception as e:
+        logger.error(f"Login error: {str(e)}")
+        return jsonify({'error': 'Login failed'}), 500
+
+@app.route('/api/logout', methods=['POST'])
+def logout():
+    try:
+        session.pop('user_id', None)
+        return jsonify({'success': True})
+    except Exception as e:
+        logger.error(f"Logout error: {str(e)}")
+        return jsonify({'error': 'Logout failed'}), 500
+
+# Error handlers
+@app.errorhandler(404)
+def not_found(error):
+    return render_template('index.html'), 404
+
+@app.errorhandler(500)
+def internal_error(error):
+    logger.error(f"Internal server error: {str(error)}")
+    return "Internal Server Error", 500
+
+# Health check endpoint for Heroku
+@app.route('/health')
+def health_check():
+    return jsonify({'status': 'healthy', 'timestamp': datetime.utcnow().isoformat()}), 200
+
+# Production entry point
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))
+    debug = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
+    
+    # Initialize database
+    with app.app_context():
+        try:
+            db.create_all()
+            logger.info("Database initialized successfully")
+        except Exception as e:
+            logger.error(f"Database initialization error: {str(e)}")
+    
+    app.run(debug=debug, host='0.0.0.0', port=port)
